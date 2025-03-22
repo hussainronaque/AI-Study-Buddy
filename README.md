@@ -4,9 +4,10 @@
 The AI Study Buddy is a web application designed to help students manage their study schedules by creating customized plans based on their availability and deadlines. The system provides study recommendations, tracks progress, and sends notifications to ensure productivity.
 
 ## Features
+- **Google Sign-in Authentication**: 
 - **AI-Generated Study Plans**: The system generates study plans based on user input, including class schedules, deadlines, and extracurricular activities.
 - **Progress Tracking**: Users can mark completed tasks and receive feedback on their study patterns.
-- **Calendar Integration**: Sync schedules with Google Calendar or Microsoft Calendar.
+- **Calendar Integration**: Sync schedules with Google Calendar.
 - **Notifications**: Receive reminders for upcoming study sessions and deadlines.
 
 ---
@@ -46,7 +47,7 @@ The AI Study Buddy is a web application designed to help students manage their s
 6. Running the Application
    Once the Docker container is running, open your browser and navigate to:
    ```bash
-   http://localhost:3000
+   http://localhost:8080
    ```
 
 7. Stopping the Application

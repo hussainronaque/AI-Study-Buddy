@@ -4,7 +4,7 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
@@ -13,8 +13,11 @@ RUN npm install
 # Copy the entire project
 COPY . .
 
-# Expose port (if needed for a backend)
-EXPOSE 3000
+# Install http-server globally
+RUN npm install -g http-server
+
+# Expose port 8080 for the application
+EXPOSE 8080
 
 # Command to run the app
-CMD ["npm", "start"]
+CMD ["http-server", "-p", "8080", "--cors"]

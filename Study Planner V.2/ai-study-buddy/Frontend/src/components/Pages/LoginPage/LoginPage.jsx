@@ -9,7 +9,6 @@ import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 import website_logo from '../../Assets/website-logo.jpeg';
 
 const LoginPage = () => {
-    const [action, setAction] = useState("Sign Up");
 
     return (
         <div className='page-container'>
@@ -45,7 +44,7 @@ const LoginPage = () => {
                 </div>
             
                 <div className='forgot-password'>
-                    Forgotten Password? 
+                    <Link to="/forgot-password">Forgot Password?</Link> 
                 </div>
 
                 <div className='signup-prompt'>

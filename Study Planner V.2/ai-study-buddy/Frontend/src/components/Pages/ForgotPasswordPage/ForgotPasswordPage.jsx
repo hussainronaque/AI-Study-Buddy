@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './SignUpPage.css';
+import './ForgotPasswordPage.css';
 
 import user_icon from '../../Assets/person.png';
 import email_icon from '../../Assets/email.png';
@@ -9,7 +9,7 @@ import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 import website_logo from '../../Assets/website-logo.jpeg'
 import back_arrow from '../../Assets/Back-Arrow.png'
 
-const SignUpPage = () => {
+const ForgotPasswordPage = () => {
 
     return (
         <div className='page-container'>
@@ -27,7 +27,7 @@ const SignUpPage = () => {
                 <div className='header'>
 
                     <div className='text'>
-                        Sign Up
+                        Forgot Password
                     </div>
 
                     <div className='underline'>
@@ -37,26 +37,19 @@ const SignUpPage = () => {
 
                 <div className='inputs'>
 
-                    <div className='input'>
-                        <img src={user_icon} alt="" />
-                        <input type="text" placeholder='Name'/>
+                    <div className='text_2'>
+                        Please enter your Email or Username for password verification.
                     </div>
 
                     <div className='input'>
                         <img src={email_icon} alt="" />
-                        <input type="text" placeholder='Email'/>
+                        <input type="text" placeholder='Username Or Email'/>
                     </div>
-
-                    <div className='input'>
-                        <img src={password_icon} alt="" />
-                        <input type="password" placeholder='Password' />
-                    </div>
-
                 </div>
 
-                <div className='signup-container'>
-                    <div className='signupbutton' onClick={()=>{}}>
-                        Sign Up
+                <div className='forgot-container'>
+                    <div className='submitbutton' onClick={()=>{}}>
+                        Submit
                     </div>
                 </div>
             </div>
@@ -64,4 +57,4 @@ const SignUpPage = () => {
     );
 };
 
-export default SignUpPage;
+export default ForgotPasswordPage;

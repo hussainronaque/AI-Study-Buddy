@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './SignUpPage.css';
+import { Link, useNavigate } from 'react-router-dom';
+import './NewPasswordPage.css';
 
-import user_icon from '../../Assets/person.png';
-import email_icon from '../../Assets/email.png';
 import password_icon from '../../Assets/password.png';
 import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 import back_arrow from '../../Assets/Back-Arrow.png'
 
-const SignUpPage = () => {
+const NewPasswordPage = () => {
+
+    const navigate = useNavigate();
+
+    const submithandleclick = () => {
+        navigate('/');
+    };
 
     return (
         <div className='page-container'>
 
-            <Link to="/" className='back-button'>
+            <Link to="/OTP" className='back-button'>
                 <img src={back_arrow} alt="" />
             </Link>
 
@@ -26,7 +30,7 @@ const SignUpPage = () => {
                 <div className='header'>
 
                     <div className='text'>
-                        Sign Up
+                        New Password
                     </div>
 
                     <div className='underline'>
@@ -36,14 +40,8 @@ const SignUpPage = () => {
 
                 <div className='inputs'>
 
-                    <div className='input'>
-                        <img src={user_icon} alt="" />
-                        <input name= 'username' type="text" placeholder='Name'/>
-                    </div>
-
-                    <div className='input'>
-                        <img src={email_icon} alt="" />
-                        <input name='email' type="text" placeholder='Email'/>
+                    <div className='text_2'>
+                        Please enter your new password.
                     </div>
 
                     <div className='input'>
@@ -58,14 +56,13 @@ const SignUpPage = () => {
 
                 </div>
 
-                <div className='signup-container'>
-                    <div className='signupbutton' onClick={()=>{}}>
-                        Sign Up
-                    </div>
+                <div className='submission-container' onClick={submithandleclick}>
+                    Submit
                 </div>
+
             </div>
         </div>
     );
 };
 
-export default SignUpPage;
+export default NewPasswordPage;

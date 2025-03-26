@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './LoginPage.css';
 
-import user_icon from '../../Assets/person.png';
 import email_icon from '../../Assets/email.png';
 import password_icon from '../../Assets/password.png';
 import website_logo_transparent from '../../Assets/website-logo-transparent.png';
-import website_logo from '../../Assets/website-logo.jpeg';
 
 const LoginPage = () => {
 
@@ -33,12 +31,12 @@ const LoginPage = () => {
                 <div className='inputs'>
                     <div className='input'>
                         <img src={email_icon} alt="" />
-                        <input type="text" placeholder='Username Or Email'/>
+                        <input name='email-username' type="text" placeholder='Username Or Email'/>
                     </div>
 
                     <div className='input'>
                         <img src={password_icon} alt="" />
-                        <input type="password" placeholder='Password' />
+                        <input name='password' type="password" placeholder='Password' />
                     </div>
 
                 </div>

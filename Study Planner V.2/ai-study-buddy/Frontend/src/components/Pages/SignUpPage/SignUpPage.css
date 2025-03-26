@@ -12,6 +12,31 @@
     align-items: center;
 }
 
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.back-button img {
+    width: 70px; 
+    height: 35px; 
+}
+
+.back-button:hover {
+    background-color: #d6d6d6;
+    transform: scale(1.05);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
 .website-logo {
     display: flex;
     justify-content: center;
@@ -142,13 +167,13 @@
     transform: translateX(5px);
 }
 
-.login-container{
+.signup-container{
     display: flex;
     gap: 10px;
     margin: 50px auto;
 }
 
-.login-container {
+.signup-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -163,7 +188,7 @@
     transition: all 0.3s ease-in-out;
 }
 
-.login-container:hover {
+.signup-container:hover {
     transform: scale(1.05);
     background: linear-gradient(#d6a904, #c0a73f);
     box-shadow: 0px 4px 10px rgba(239, 191, 4, 0.5);

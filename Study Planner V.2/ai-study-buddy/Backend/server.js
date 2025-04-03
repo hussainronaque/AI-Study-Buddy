@@ -7,7 +7,6 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
 
-
 const corsOptions = {
     origin: '*',
     credentials: true,

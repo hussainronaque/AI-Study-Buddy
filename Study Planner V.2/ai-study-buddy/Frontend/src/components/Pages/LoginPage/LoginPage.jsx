@@ -8,6 +8,11 @@ import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 
 const LoginPage = () => {
 
+    const [credentials, checkCredentials] = useState('')
+    const [password, checkPassword] = useState('')
+
+
+
     return (
         <div className='page-container'>
 
@@ -54,7 +59,9 @@ const LoginPage = () => {
                         Login
                     </div>
                 </div>
+
             </div>
+
         </div>
     );
 };

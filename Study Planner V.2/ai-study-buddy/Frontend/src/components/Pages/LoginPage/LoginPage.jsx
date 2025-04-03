@@ -10,7 +10,10 @@ const LoginPage = () => {
 
     const [credentials, checkCredentials] = useState('')
     const [password, checkPassword] = useState('')
-
+    function handleSubmit (event) {
+        event.preventDefault();
+        
+    }
 
 
     return (

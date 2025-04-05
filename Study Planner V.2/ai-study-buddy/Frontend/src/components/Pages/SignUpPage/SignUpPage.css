@@ -157,3 +157,17 @@
     background: #eaeaea;
     color: #676767;
 }
+
+.login-prompt {
+    padding-left: 62px;
+    margin-top: 16px;
+    font-size: 18px;
+    color: #42006C;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.login-prompt:hover {
+    color: #9226c0;
+    transform: translateX(5px);
+}

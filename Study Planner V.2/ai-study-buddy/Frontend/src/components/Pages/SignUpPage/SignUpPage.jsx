@@ -64,9 +64,14 @@ const SignUpPage = () => {
 
                 </div>
 
+                <div className='login-prompt'>
+                    <Link to="/">Already Have An Account? Login!</Link>
+                </div>
+
                 <div className='signup-container' onClick={submithandleclick}>
                     Sign Up
                 </div>
+                
             </div>
         </div>
     );

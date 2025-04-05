@@ -5,16 +5,24 @@ import './LoginPage.css';
 import email_icon from '../../Assets/email.png';
 import password_icon from '../../Assets/password.png';
 import website_logo_transparent from '../../Assets/website-logo-transparent.png';
+import { useNavigate } from 'react-router-dom';
+
 
 const LoginPage = () => {
 
     const [credentials, checkCredentials] = useState('')
     const [password, checkPassword] = useState('')
-    function handleSubmit (event) {
-        event.preventDefault();
-        
-    }
+    const navigate = useNavigate();
+    const handleLogin = () => {
+        // Perform login logic here
+        // For example, you can send a request to your backend API for authentication
+        // If successful, navigate to the dashboard
+        navigate('/dashboard');
+    };
 
+    function handleSubmit(event) {
+        event.preventDefault();
+    }
 
     return (
         <div className='page-container'>
@@ -58,7 +66,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className='login-container'>
-                    <div className='loginbutton' onClick={()=>{}}>
+                    <div className='loginbutton' onClick={handleLogin}>
                         Login
                     </div>
                 </div>

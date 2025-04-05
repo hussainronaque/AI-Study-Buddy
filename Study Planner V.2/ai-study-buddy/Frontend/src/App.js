@@ -4,6 +4,8 @@ import SignUpPage from './components/Pages/SignUpPage/SignUpPage';
 import ForgotPasswordPage from './components/Pages/ForgotPasswordPage/ForgotPasswordPage';
 import OTPPage from './components/Pages/OTPPage/OTPPage';
 import NewPasswordPage from './components/Pages/NewPasswordPage/NewPasswordPage';
+import DashboardPage from './components/Pages/DashboardPage/DashboardPage';
+
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
         <Route path="/OTP" element={<OTPPage/>} />
         <Route path="/new-password" element={<NewPasswordPage/>} />
         <Route path="/homepage" element={<SignUpPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </Router>
   );

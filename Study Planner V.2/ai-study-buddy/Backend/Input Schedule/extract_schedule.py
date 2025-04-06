@@ -656,6 +656,18 @@ class EnhancedScheduleProcessor:
                 processed_keys.add(base_key)
         
         return combined_schedule
+    
+def extract_schedule(image_path: str = None, text: str = None) -> list:
+    """
+    Wrapper around EnhancedScheduleProcessor to unify image/text input.
+    """
+    processor = EnhancedScheduleProcessor()
+    if image_path:
+        return processor.process_schedule_image(image_path)
+    elif text:
+        return processor.process_schedule_text(text)
+    else:
+        raise ValueError("Either image_path or text must be provided")
 
 # Example usage
 def main():

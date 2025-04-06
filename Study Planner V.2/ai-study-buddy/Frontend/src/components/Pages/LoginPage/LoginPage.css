@@ -146,3 +146,14 @@
     background: #eaeaea;
     color: #676767;
 }
+
+.google-signin-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#my-signin2 {
+    width: 240px;
+    margin: 0 auto;
+}

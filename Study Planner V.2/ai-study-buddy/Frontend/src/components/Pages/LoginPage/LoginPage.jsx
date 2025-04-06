@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './LoginPage.css';
 
@@ -10,8 +10,8 @@ import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
 
-    const [credentials, checkCredentials] = useState('')
-    const [password, checkPassword] = useState('')
+    // const [credentials, checkCredentials] = useState('')
+    // const [password, checkPassword] = useState('')
     const navigate = useNavigate();
     const handleLogin = () => {
         // Perform login logic here
@@ -20,9 +20,57 @@ const LoginPage = () => {
         navigate('/dashboard');
     };
 
-    function handleSubmit(event) {
-        event.preventDefault();
-    }
+    const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+
+    useEffect(() => {
+        // Initialize Google Sign-In
+    const initializeGoogleSignIn = () => {
+        if (window.google && window.google.accounts) {
+            window.google.accounts.id.initialize({
+                client_id: '717882539289-j5pfmv17tg1gbnrtncbajehdjjjreenf.apps.googleusercontent.com',
+                callback: handleGoogleSignIn,
+                auto_select: false,
+                cancel_on_tap_outside: true,
+                ux_mode: 'popup',  // Add this line
+            });
+            window.google.accounts.id.renderButton(
+                document.getElementById('my-signin2'),
+                { 
+                    theme: 'outline', 
+                    size: 'large', 
+                    width: 240,
+                    type: 'standard'  // Add this line
+                }
+            );
+        }
+    };
+
+        const handleGoogleSignIn = (response) => {
+            if (response.credential) {
+                console.log('Google Sign-In successful');
+                navigate('/dashboard');
+            }
+        };
+
+        // Load the Google Sign-In script if not already loaded
+        if (!isScriptLoaded) {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.onload = () => {
+                setIsScriptLoaded(true);
+                initializeGoogleSignIn();
+            };
+            document.head.appendChild(script);
+
+            return () => {
+                document.head.removeChild(script);
+            };
+        } else {
+            initializeGoogleSignIn();
+        }
+    }, [navigate, isScriptLoaded]);
 
     return (
         <div className='page-container'>
@@ -69,6 +117,16 @@ const LoginPage = () => {
                     <div className='loginbutton' onClick={handleLogin}>
                         Login
                     </div>
+                </div>
+
+                <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                    <div className='or'>
+                        OR
+                    </div>
+                </div>
+                
+                <div className="google-signin-container">
+                    <div id="my-signin2"></div>
                 </div>
 
             </div>

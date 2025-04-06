@@ -171,3 +171,14 @@
     color: #9226c0;
     transform: translateX(5px);
 }
+
+.google-signin-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#my-signin2 {
+    width: 240px;
+    margin: 0 auto;
+}

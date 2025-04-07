@@ -6,7 +6,6 @@ import OTPPage from './components/Pages/OTPPage/OTPPage';
 import NewPasswordPage from './components/Pages/NewPasswordPage/NewPasswordPage';
 import DashboardPage from './components/Pages/DashboardPage/DashboardPage';
 
-
 function App() {
   return (
     <Router>
@@ -18,6 +17,8 @@ function App() {
         <Route path="/new-password" element={<NewPasswordPage/>} />
         <Route path="/homepage" element={<SignUpPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/otp" element={<OTPPage />} />
+        <Route path="/new-password" element={<NewPasswordPage />} />
       </Routes>
     </Router>
   );

@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# openai api
+Study Planner V.2/ai-study-buddy/Backend/Input Schedule/.env

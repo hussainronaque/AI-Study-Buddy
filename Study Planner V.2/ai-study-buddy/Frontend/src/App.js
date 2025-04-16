@@ -11,14 +11,12 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} /> {/* optional alias */}
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
-        <Route path="/OTP" element={<OTPPage/>} />
-        <Route path="/new-password" element={<NewPasswordPage/>} />
-        <Route path="/homepage" element={<SignUpPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/otp" element={<OTPPage />} />
         <Route path="/new-password" element={<NewPasswordPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </Router>
   );

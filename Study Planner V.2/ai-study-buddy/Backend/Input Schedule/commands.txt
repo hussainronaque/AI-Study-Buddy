@@ -1,0 +1,5 @@
+Run command:
+python "D:\.Files\Work\Habib\Semester 6\Software Engineering\Project\Repository\AI-Study-Buddy\Study Planner V.2\ai-study-buddy\Backend\Input Schedule\upload_schedule.py" --image "D:\.Files\Work\Habib\Semester 6\Software Engineering\Project\Repository\AI-Study-Buddy\Study Planner V.2\ai-study-buddy\Backend\Input Schedule\image.png" --firebase-uid "USER_FIREBASE_UID" --email "user@example.com" --name "User Name"
+
+Image Path:
+D:\.Files\Work\Habib\Semester 6\Software Engineering\Project\Repository\AI-Study-Buddy\Study Planner V.2\ai-study-buddy\Backend\Input Schedule\image.png

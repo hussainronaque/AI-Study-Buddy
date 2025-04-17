@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { config } from '../../../config';
 import './LoginPage.css';
 
 import email_icon from '../../Assets/email.png';
@@ -9,42 +10,52 @@ import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 
 const LoginPage = () => {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError('');
+    
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post(`${config.API_BASE_URL}/api/auth/login`, {
         email,
         password,
       });
 
       if (res.data.token) {
-        // Optionally store token: localStorage.setItem('token', res.data.token);
+        localStorage.setItem('token', res.data.token);
         navigate('/dashboard');
-      } else {
-        setError('Invalid login credentials');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleGoogleSignIn = (response) => {
+  const handleGoogleSignIn = useCallback((response) => {
     if (response.credential) {
+      // Handle Google sign-in token
       console.log('Google Sign-In successful');
       navigate('/dashboard');
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
     const initializeGoogleSignIn = () => {
       if (window.google && window.google.accounts) {
         window.google.accounts.id.initialize({
-          client_id: '717882539289-j5pfmv17tg1gbnrtncbajehdjjjreenf.apps.googleusercontent.com',
+          client_id: config.GOOGLE_CLIENT_ID,
           callback: handleGoogleSignIn,
           auto_select: false,
           cancel_on_tap_outside: true,
@@ -80,7 +91,7 @@ const LoginPage = () => {
     } else {
       initializeGoogleSignIn();
     }
-  }, [isScriptLoaded]);
+  }, [isScriptLoaded, handleGoogleSignIn]);
 
   return (
     <div className="page-container">
@@ -94,40 +105,48 @@ const LoginPage = () => {
           <div className="underline"></div>
         </div>
 
-        <div className="inputs">
-          <div className="input">
-            <img src={email_icon} alt="email" />
-            <input
-              type="text"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        <form onSubmit={handleLogin}>
+          <div className="inputs">
+            <div className="input">
+              <img src={email_icon} alt="email" />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input">
+              <img src={password_icon} alt="password" />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
           </div>
-          <div className="input">
-            <img src={password_icon} alt="password" />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="forgot-password">
+            <Link to="/forgot-password">Forgot Password?</Link>
           </div>
-        </div>
 
-        {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
+          <div className="login-prompt">
+            <Link to="/signup">Don't have an account? Sign Up</Link>
+          </div>
 
-        <div className="forgot-password">
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </div>
-
-        <div className="login-prompt">
-          <Link to="/signup">Don’t have an account? Sign Up</Link>
-        </div>
-
-        <div className="signup-container" onClick={handleLogin}>
-          Login
-        </div>
+          <button 
+            type="submit" 
+            className="signup-container"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
 
         <div style={{ textAlign: 'center', margin: '20px 0' }}>
           <div className="or">OR</div>

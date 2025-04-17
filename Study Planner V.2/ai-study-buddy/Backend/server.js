@@ -5,8 +5,8 @@ require('dotenv').config();
 
 // Import routes
 const otpRoutes = require('./OTP/otpRoutes');
+const authRoutes = require('./routes/auth');
 
-// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -14,20 +14,38 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
 // Routes
 app.use('/api', otpRoutes);
+app.use('/api/auth', authRoutes);
 
-// Default route
-app.get('/', (req, res) => {
-  res.send('AI Study Buddy API is running');
+// Connect to MongoDB with enhanced error handling
+console.log('Attempting to connect to MongoDB...');
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'URI is set' : 'URI is not set');
+
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('✅ MongoDB connected successfully');
+  console.log('Database name:', mongoose.connection.name);
+})
+.catch(err => {
+  console.error('❌ MongoDB connection error:', err);
+  console.error('Error details:', err.message);
+  console.error('Error code:', err.code);
+  console.error('Error name:', err.name);
 });
 
-// Start server
+// Add error handler for MongoDB connection
+mongoose.connection.on('error', err => {
+  console.error('MongoDB connection error after initial connection:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+  console.log(`🚀 Server running on port ${PORT}`);
+});

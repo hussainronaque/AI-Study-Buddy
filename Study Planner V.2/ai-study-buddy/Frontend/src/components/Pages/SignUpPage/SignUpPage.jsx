@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { config } from '../../../config';
 
 import './SignUpPage.css';
 import user_icon from '../../Assets/person.png';
@@ -17,6 +18,7 @@ const SignUpPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   const handleGoogleSignIn = useCallback((response) => {
@@ -69,25 +71,52 @@ const SignUpPage = () => {
   }, [isScriptLoaded, handleGoogleSignIn]);
 
   const submithandleclick = async () => {
+    // Validate inputs
+    if (!username || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    console.log('Attempting to sign up with:', { username, email });
+    console.log('API URL:', `${config.API_BASE_URL}/api/auth/signup`);
+
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/signup', {
+      console.log('Sending signup request...');
+      const response = await axios.post(`${config.API_BASE_URL}/api/auth/signup`, {
         username,
         email,
         password,
       });
+      
+      console.log('Signup response:', response.data);
 
-      if (res.data.message === 'User created successfully') {
+      if (response.data.message === 'User created successfully') {
         navigate('/login');
-      } else {
-        setError(res.data.message || 'Sign up failed');
       }
     } catch (err) {
-      setError('Server error. Please try again later.');
+      console.error('Signup error details:', err);
+      console.error('Error response:', err.response);
+      
+      if (err.response?.data?.message === 'User already exists') {
+        setError('An account with this email already exists');
+      } else {
+        setError(err.response?.data?.message || 'Server error. Please try again later.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,7 +149,7 @@ const SignUpPage = () => {
           <div className="input">
             <img src={email_icon} alt="email" />
             <input
-              type="text"
+              type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -146,14 +175,17 @@ const SignUpPage = () => {
           </div>
         </div>
 
-        {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
         <div className="login-prompt">
           <Link to="/login">Already Have An Account? Login!</Link>
         </div>
 
-        <div className="signup-container" onClick={submithandleclick}>
-          Sign Up
+        <div 
+          className={`signup-container ${isLoading ? 'loading' : ''}`} 
+          onClick={submithandleclick}
+        >
+          {isLoading ? 'Signing up...' : 'Sign Up'}
         </div>
 
         <div style={{ textAlign: 'center', margin: '20px 0' }}>

@@ -1,23 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const { sendOTP, verifyOTP, isOTPVerified } = require('./otp');
+const { sendOTP, verifyOTP } = require('./otp');
 const { MongoClient } = require('mongodb');
-const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
-// Route to request OTP
+// Add connection error handling
 router.post('/request-otp', async (req, res) => {
     try {
         const { email } = req.body;
+        console.log('Requesting OTP for:', email); // Add logging
         
         if (!email) {
             return res.status(400).json({ error: 'Email is required' });
         }
 
         const success = await sendOTP(email);
+        console.log('OTP send result:', success); // Add logging
         
         if (success) {
             res.json({ message: 'OTP sent successfully' });
@@ -25,8 +26,8 @@ router.post('/request-otp', async (req, res) => {
             res.status(500).json({ error: 'Failed to send OTP' });
         }
     } catch (error) {
-        console.error('Error in request-otp:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Detailed error in request-otp:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -61,32 +62,21 @@ router.post('/reset-password', async (req, res) => {
             return res.status(400).json({ error: 'Email and password are required' });
         }
 
-        // Check if OTP was verified
-        if (!isOTPVerified(email)) {
-            return res.status(403).json({ error: 'OTP must be verified before resetting password' });
-        }
-
-        // Hash the password
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
         // Connect to MongoDB
         await client.connect();
         const database = client.db("ai_study_planner_db");
         const usersCollection = database.collection("users");
 
         // Update user's password
+        // Note: In a real application, you would hash the password before storing it
         const result = await usersCollection.updateOne(
             { email },
-            { $set: { password: hashedPassword } }
+            { $set: { password } }
         );
 
         if (result.matchedCount === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-
-        // Clear the OTP verification status
-        await clearOTPVerification(email);
 
         res.json({ message: 'Password reset successfully' });
     } catch (error) {

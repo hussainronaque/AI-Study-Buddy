@@ -1,65 +1,7 @@
-// import React, { useState } from 'react';
-// import { Link, useNavigate } from 'react-router-dom';
-// import './OTPPage.css';
-
-// import website_logo_transparent from '../../Assets/website-logo-transparent.png'
-// import back_arrow from '../../Assets/Back-Arrow.png'
-
-// const OTPPage = () => {
-
-//     const navigate = useNavigate();
-
-//     const submithandleclick = () => {
-//         navigate('/new-password');
-//     };
-
-//     return (
-//         <div className='page-container'>
-
-//             <Link to="/forgot-password" className='back-button'>
-//                 <img src={back_arrow} alt="" />
-//             </Link>
-
-//             <div className='website-logo'>
-//                 <img src={website_logo_transparent} alt="" />
-//             </div>
-            
-//             <div className='content-container'>
-
-//                 <div className='header'>
-
-//                     <div className='text'>
-//                         OTP Verification
-//                     </div>
-
-//                     <div className='underline'>
-//                     </div>
-
-//                 </div>
-
-//                 <div className='inputs'>
-
-//                     <div className='text_2'>
-//                         Please enter the OTP sent to your registered email.
-//                     </div>
-
-//                     <div className='input'>
-//                         <input name='otp' type="text" placeholder='#PIN'/>
-//                     </div>
-//                 </div>
-
-//                 <div className='submission-container' onClick={submithandleclick}>
-//                     Submit
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default OTPPage;
-
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { config } from '../../../config';
 import './OTPPage.css';
 
 import website_logo_transparent from '../../Assets/website-logo-transparent.png';
@@ -67,9 +9,43 @@ import back_arrow from '../../Assets/Back-Arrow.png';
 
 const OTPPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [otp, setOtp] = useState(['', '', '', '']);
     const [error, setError] = useState('');
-    const correctOTP = '1234'; // In a real app, this would come from your backend
+    const [email, setEmail] = useState('');
+    const [timer, setTimer] = useState(300); // 5 minutes in seconds
+    const [canResend, setCanResend] = useState(false);
+
+    useEffect(() => {
+        // Get email from location state
+        const emailFromState = location.state?.email;
+        if (emailFromState) {
+            setEmail(emailFromState);
+        } else {
+            // If no email in state, redirect to forgot password
+            navigate('/forgot-password');
+        }
+
+        // Start timer
+        const interval = setInterval(() => {
+            setTimer((prevTimer) => {
+                if (prevTimer <= 1) {
+                    setCanResend(true);
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prevTimer - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [location, navigate]);
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
 
     const handleOtpChange = (index, value) => {
         if (isNaN(value)) return;
@@ -93,7 +69,7 @@ const OTPPage = () => {
         }
     };
 
-    const verifyOtp = () => {
+    const verifyOtp = async () => {
         const enteredOTP = otp.join('');
         
         if (enteredOTP.length !== 4) {
@@ -101,12 +77,17 @@ const OTPPage = () => {
             return;
         }
 
-        if (enteredOTP === correctOTP) {
-            // OTP is correct
-            console.log('OTP verified successfully');
-            navigate('/new-password');
-        } else {
-            setError('Invalid OTP. Please try again.');
+        try {
+            const response = await axios.post(`${config.API_BASE_URL}/api/verify-otp`, {
+                email,
+                otp: enteredOTP
+            });
+
+            if (response.data.message === 'OTP verified successfully') {
+                navigate('/new-password', { state: { email } });
+            }
+        } catch (error) {
+            setError(error.response?.data?.error || 'Failed to verify OTP');
             // Clear OTP fields
             setOtp(['', '', '', '']);
             // Focus first input
@@ -115,11 +96,22 @@ const OTPPage = () => {
         }
     };
 
-    const handleResendOtp = () => {
-        // Add your resend OTP logic here
-        setError('');
-        setOtp(['', '', '', '']);
-        alert('New OTP has been sent to your email');
+    const handleResendOtp = async () => {
+        if (!canResend) return;
+
+        try {
+            const response = await axios.post(`${config.API_BASE_URL}/api/request-otp`, { email });
+            
+            if (response.data.message === 'OTP sent successfully') {
+                setError('');
+                setOtp(['', '', '', '']);
+                setTimer(300);
+                setCanResend(false);
+                alert('New OTP has been sent to your email');
+            }
+        } catch (error) {
+            setError(error.response?.data?.error || 'Failed to resend OTP');
+        }
     };
 
     return (
@@ -139,7 +131,7 @@ const OTPPage = () => {
                 </div>
 
                 <div className='text_2'>
-                    Enter the 4-digit verification code sent to your email
+                    Enter the 4-digit verification code sent to {email}
                 </div>
 
                 <div className='otp-inputs'>
@@ -160,13 +152,22 @@ const OTPPage = () => {
 
                 {error && <div className='error-message'>{error}</div>}
 
+                <div className='timer'>
+                    Time remaining: {formatTime(timer)}
+                </div>
+
                 <div className='submission-container' onClick={verifyOtp}>
                     Verify OTP
                 </div>
 
                 <div className='resend-prompt'>
                     Didn't receive the code? 
-                    <span className='resend-link' onClick={handleResendOtp}> Resend OTP</span>
+                    <span 
+                        className={`resend-link ${canResend ? 'active' : 'disabled'}`} 
+                        onClick={handleResendOtp}
+                    >
+                        Resend OTP
+                    </span>
                 </div>
             </div>
         </div>

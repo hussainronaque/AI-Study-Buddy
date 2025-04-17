@@ -61,6 +61,10 @@ const LoginPage = () => {
           <Link to="/signup">Don't have an account? Sign Up</Link>
         </div>
 
+        <div className="login-prompt">
+          <Link to="/forgot-password">Forgot Password?</Link>
+        </div>
+
         <div className="signup-container" onClick={handleLogin}>
           Login
         </div>

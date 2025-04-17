@@ -7,31 +7,20 @@ const router = express.Router();
 
 // SIGN UP
 router.post('/signup', async (req, res) => {
-  console.log('Signup request received:', req.body);
   const { username, email, password } = req.body;
 
   try {
-    console.log('Checking for existing user with email:', email);
     const existingUser = await User.findOne({ email });
-    
     if (existingUser) {
-      console.log('User already exists with email:', email);
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    console.log('Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    console.log('Creating new user...');
     const newUser = new User({ username, email, password: hashedPassword });
-    
-    console.log('Saving user to database...');
     await newUser.save();
-    
-    console.log('User created successfully:', email);
+
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
-    console.error('Error in signup route:', err);
     res.status(500).json({ message: 'Something went wrong', error: err.message });
   }
 });

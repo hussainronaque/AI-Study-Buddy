@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { config } from '../../../config';
 
 import './SignUpPage.css';
 import user_icon from '../../Assets/person.png';
@@ -18,8 +17,6 @@ const SignUpPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   const handleGoogleSignIn = useCallback((response) => {
     if (response.credential) {
@@ -32,91 +29,48 @@ const SignUpPage = () => {
     const initializeGoogleSignIn = () => {
       if (window.google && window.google.accounts) {
         window.google.accounts.id.initialize({
-          client_id: '717882539289-j5pfmv17tg1gbnrtncbajehdjjjreenf.apps.googleusercontent.com',
+          client_id: 'YOUR_CLIENT_ID_HERE',
           callback: handleGoogleSignIn,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-          ux_mode: 'popup',
         });
-
         window.google.accounts.id.renderButton(
           document.getElementById('my-signin2'),
-          {
-            theme: 'outline',
-            size: 'large',
-            width: 240,
-            type: 'standard',
-          }
+          { theme: 'outline', size: 'large' }
         );
       }
     };
 
-    if (!isScriptLoaded) {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        setIsScriptLoaded(true);
-        initializeGoogleSignIn();
-      };
-      document.head.appendChild(script);
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogleSignIn;
+    document.head.appendChild(script);
 
-      return () => {
-        document.head.removeChild(script);
-      };
-    } else {
-      initializeGoogleSignIn();
-    }
-  }, [isScriptLoaded, handleGoogleSignIn]);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [handleGoogleSignIn]);
 
   const submithandleclick = async () => {
-    // Validate inputs
-    if (!username || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
-      return;
-    }
-
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-
-    console.log('Attempting to sign up with:', { username, email });
-    console.log('API URL:', `${config.API_BASE_URL}/api/auth/signup`);
-
     try {
-      console.log('Sending signup request...');
-      const response = await axios.post(`${config.API_BASE_URL}/api/auth/signup`, {
+      const res = await axios.post('/api/auth/signup', {
         username,
         email,
         password,
       });
-      
-      console.log('Signup response:', response.data);
 
-      if (response.data.message === 'User created successfully') {
+      if (res.data.message === 'User created successfully') {
         navigate('/login');
+      } else {
+        setError(res.data.message || 'Sign up failed');
       }
     } catch (err) {
-      console.error('Signup error details:', err);
-      console.error('Error response:', err.response);
-      
-      if (err.response?.data?.message === 'User already exists') {
-        setError('An account with this email already exists');
-      } else {
-        setError(err.response?.data?.message || 'Server error. Please try again later.');
-      }
-    } finally {
-      setIsLoading(false);
+      setError(err.response?.data?.message || 'Server error. Please try again later.');
     }
   };
 
@@ -139,62 +93,35 @@ const SignUpPage = () => {
         <div className="inputs">
           <div className="input">
             <img src={user_icon} alt="user" />
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
+            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="input">
             <img src={email_icon} alt="email" />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="input">
             <img src={password_icon} alt="password" />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <div className="input">
             <img src={password_icon} alt="confirm" />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+            <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
 
         <div className="login-prompt">
           <Link to="/login">Already Have An Account? Login!</Link>
         </div>
 
-        <div 
-          className={`signup-container ${isLoading ? 'loading' : ''}`} 
-          onClick={submithandleclick}
-        >
-          {isLoading ? 'Signing up...' : 'Sign Up'}
+        <div className="signup-container" onClick={submithandleclick}>
+          Sign Up
         </div>
 
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <div className="or">OR</div>
-        </div>
+        <div className="or">OR</div>
 
-        <div className="google-signin-container">
-          <div id="my-signin2"></div>
-        </div>
+        <div id="my-signin2"></div>
       </div>
     </div>
   );

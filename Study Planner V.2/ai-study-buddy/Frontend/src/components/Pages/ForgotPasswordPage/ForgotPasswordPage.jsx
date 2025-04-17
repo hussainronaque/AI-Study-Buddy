@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { config } from '../../../config';
 import './ForgotPasswordPage.css';
 
 import email_icon from '../../Assets/email.png';
@@ -9,42 +7,16 @@ import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 import back_arrow from '../../Assets/Back-Arrow.png'
 
 const ForgotPasswordPage = () => {
+
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async () => {
-        if (!email) {
-            setError('Please enter your email');
-            return;
-        }
-
-        // Basic email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setError('Please enter a valid email address');
-            return;
-        }
-
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await axios.post(`${config.API_BASE_URL}/api/request-otp`, { email });
-            
-            if (response.data.message === 'OTP sent successfully') {
-                // Navigate to OTP page with email in state
-                navigate('/OTP', { state: { email } });
-            }
-        } catch (error) {
-            setError(error.response?.data?.error || 'Failed to send OTP. Please try again.');
-            setLoading(false);
-        }
+    const submithandleclick = () => {
+        navigate('/OTP');
     };
 
     return (
         <div className='page-container'>
+
             <Link to="/" className='back-button'>
                 <img src={back_arrow} alt="" />
             </Link>
@@ -54,37 +26,32 @@ const ForgotPasswordPage = () => {
             </div>
             
             <div className='content-container'>
+
                 <div className='header'>
+
                     <div className='text'>
                         Forgot Password
                     </div>
-                    <div className='underline'></div>
+
+                    <div className='underline'>
+                    </div>
+
                 </div>
 
                 <div className='inputs'>
+
                     <div className='text_2'>
-                        Please enter your email for password reset.
+                        Please enter your Email or Username for password authentication.
                     </div>
 
                     <div className='input'>
                         <img src={email_icon} alt="" />
-                        <input 
-                            name='email' 
-                            type="email" 
-                            placeholder='Email Address'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                        <input name='email-username' type="text" placeholder='Username Or Email'/>
                     </div>
-                    
-                    {error && <div className='error-message'>{error}</div>}
                 </div>
 
-                <div 
-                    className={`forgot-container ${loading ? 'loading' : ''}`} 
-                    onClick={handleSubmit}
-                >
-                    {loading ? 'Sending...' : 'Submit'}
+                <div className='forgot-container' onClick={submithandleclick}>
+                    Submit
                 </div>
             </div>
         </div>

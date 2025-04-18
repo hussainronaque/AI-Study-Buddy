@@ -58,6 +58,32 @@ async function run() {
     });
     console.log("✅ Created 'users' collection");
 
+    // 7️⃣ Notes Collection
+    await database.createCollection("notes", {
+      validator: {
+        $jsonSchema: {
+          bsonType: "object",
+          required: ["user_id", "title", "content", "created_at"],
+          properties: {
+            user_id: { bsonType: "objectId" },
+            title: { bsonType: "string" },
+            content: { bsonType: "string" },
+            category: { bsonType: "string", enum: ["Study", "Personal", "Work", "Other"] },
+            tags: { 
+              bsonType: "array",
+              items: { bsonType: "string" }
+            },
+            color: { bsonType: "string" },
+            isPinned: { bsonType: "bool" },
+            isArchived: { bsonType: "bool" },
+            created_at: { bsonType: "date" },
+            updated_at: { bsonType: "date" }
+          }
+        }
+      }
+    });
+    console.log("✅ Created 'notes' collection");
+
     // 2️⃣ Schedules Collection
     await database.createCollection("schedules", {
       validator: {
@@ -188,6 +214,7 @@ async function run() {
     await database.collection("schedules").createIndex({ "user_id": 1 });
     await database.collection("study_plans").createIndex({ "user_id": 1 });
     await database.collection("progress_tracking").createIndex({ "user_id": 1 });
+    await database.collection("notes").createIndex({ "user_id": 1 });
     console.log("✅ Indexing completed!");
 
     console.log("🎉 Database setup completed successfully!");

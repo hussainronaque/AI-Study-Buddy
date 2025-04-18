@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config({ path: './Database/connection_string.env' });
 
-
 const authRoutes = require('./routes/auth');
+const notesRoutes = require('./routes/notes');
 
 const app = express();
 
@@ -22,8 +22,9 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error('❌ MongoDB connection error:', err);
 });
 
-// Use the auth routes
+// Use the routes
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', notesRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 4000;

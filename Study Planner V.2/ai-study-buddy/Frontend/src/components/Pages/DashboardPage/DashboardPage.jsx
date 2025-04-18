@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './DashboardPage.css';
 import website_logo_transparent from '../../Assets/website-logo-transparent.png';
 
 const DashboardPage = () => {
     const navigate = useNavigate();
+    const [recentNotes, setRecentNotes] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchRecentNotes();
+    }, []);
+
+    const fetchRecentNotes = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:4000/api/notes/recent', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setRecentNotes(response.data);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching recent notes:', error);
+            setLoading(false);
+        }
+    };
 
     const handleLogout = () => {
+        localStorage.removeItem('token');
         navigate('/');
     };
 
@@ -18,7 +40,7 @@ const DashboardPage = () => {
                 </div>
                 <div className="nav-links">
                     <button className="nav-item active">Dashboard</button>
-                    <button className="nav-item">Notes</button>
+                    <button className="nav-item" onClick={() => navigate('/notes')}>Notes</button>
                     <button className="nav-item">Calendar</button>
                     <button className="nav-item">Tasks</button>
                     <button className="nav-item">AI Assistant</button>
@@ -37,7 +59,21 @@ const DashboardPage = () => {
                 <div className="dashboard-grid">
                     <div className="dashboard-card">
                         <h3>Recent Notes</h3>
-                        <p>No notes yet</p>
+                        {loading ? (
+                            <p>Loading notes...</p>
+                        ) : recentNotes.length === 0 ? (
+                            <p>No notes yet</p>
+                        ) : (
+                            <div className="recent-notes-list">
+                                {recentNotes.map(note => (
+                                    <div key={note._id} className="recent-note-item" onClick={() => navigate('/notes')}>
+                                        <h4>{note.title}</h4>
+                                        <p>{note.content.substring(0, 50)}...</p>
+                                        <small>{new Date(note.updatedAt).toLocaleDateString()}</small>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div className="dashboard-card">
                         <h3>Upcoming Tasks</h3>

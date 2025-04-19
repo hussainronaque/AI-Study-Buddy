@@ -27,7 +27,7 @@
 
 .sidebar-logo img {
   width: 100%;
-  max-width: 250px;
+  max-width: 120px;
   height: auto;
   object-fit: contain;
 }
@@ -49,7 +49,7 @@
   padding: 10px 15px;
   text-align: left;
   cursor: pointer;
-  font-size: 24%;
+  font-size: 15%;
   border-radius: 8px;
   transition: background 0.2s ease-in-out;
 }
@@ -66,12 +66,12 @@
   padding: 10px 15px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 13px;
   margin-top: auto;
   transition: background 0.2s ease-in-out;
   width: 100%;
   height: auto;
-  max-width: 250px;
+  max-width: 150px;
   margin-bottom: 2vh;
 }
 
@@ -85,8 +85,10 @@
   background-color: #f4f6fa;
   padding: 30px;
   overflow-y: auto;
+  overflow-x: auto;
   width: 100%;
   max-width: 85vw;
+  justify-content: left;
 }
 
 .welcome-section h1 {

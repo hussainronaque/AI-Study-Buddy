@@ -3,108 +3,75 @@ import os
 import argparse
 from pymongo import MongoClient
 from bson import ObjectId
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone
+
 from extract_schedule import extract_schedule
 
-DEFAULT_MONGO_URI = "mongodb+srv://shayaanqazi:3syGsUHkPXnjIDgU@cluster0.57on7ed.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-def parse_time_str(time_str: str) -> datetime:
-    """
-    Convert "HH:MM AM/PM" into a timezone-aware datetime (today's date).
-    """
-    # If empty, return None
-    if not time_str:
-        return None
-    # Parse into a time object
-    t = datetime.strptime(time_str, "%I:%M %p").time()
-    # Combine with today's date in UTC
-    return datetime.combine(date.today(), t, tzinfo=timezone.utc)
+# Store the MongoDB connection string directly in the script
+DEFAULT_MONGO_URI = "mongodb+srv://shayaanqazi:shDjocJeMTuQHA8K@cluster0.57on7ed.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 class ScheduleUploader:
     def __init__(self, mongo_uri=None, db_name="ai_study_planner_db"):
+        # Use the default URI if none is provided
         self.mongo_uri = mongo_uri or os.getenv("MONGODB_URI") or DEFAULT_MONGO_URI
         self.client = MongoClient(self.mongo_uri, serverSelectionTimeoutMS=5000)
         self.db = self.client[db_name]
-        self.users = self.db["users"]
-        self.schedules = self.db["schedules"]
+        self.collection = self.db["schedules"]
 
-    def get_or_create_user(self, firebase_uid, email, name):
-        user = self.users.find_one({"firebase_uid": firebase_uid})
-        if user:
-            print(f"User {firebase_uid} found.")
-            return user["_id"]
-
-        print(f"User {firebase_uid} not found. Creating new user...")
-        now = datetime.now(timezone.utc)
-        new_user = {
-            "firebase_uid": firebase_uid,
-            "name": name,
-            "email": email,
-            "profile_picture": "",
-            "preferences": {
-                "study_hours_per_day": 2,
-                "notification_settings": {"email": True, "push": True},
-                "integrations": {"google_calendar": False, "microsoft_calendar": False}
-            },
-            "created_at": now,
-            "updated_at": now
-        }
-        return self.users.insert_one(new_user).inserted_id
-
-    def upload_schedule(self, user_id, schedule):
-        # Remove old entries
-        self.schedules.delete_many({"user_id": ObjectId(user_id)})
-
-        now = datetime.now(timezone.utc)
+    def upload(self, user_id, schedule):
         docs = []
         for e in schedule:
-            start_dt = parse_time_str(e["start_time"])
-            end_dt   = parse_time_str(e.get("end_time", ""))
+            try:
+                # Parse time strings into datetime objects (dummy date 1900-01-01)
+                start_dt = datetime.strptime(e["start_time"], "%I:%M%p")
+                start_dt = start_dt.replace(tzinfo=timezone.utc)
 
-            docs.append({
-                "user_id": ObjectId(user_id),
-                "type": "class",             # adjust if you have other types
-                "title": e["course"],
-                "description": e.get("type", ""),  
-                "start_time": start_dt,
-                "end_time": end_dt,
-                "priority": "medium",
-                "recurring": {"type": "none", "interval": 0},
-                "status": "upcoming",
-                "created_at": now,
-                "updated_at": now
-            })
+                end_dt = None
+                end_str = e.get("end_time", "")
+                if end_str:
+                    end_dt = datetime.strptime(end_str, "%I:%M%p")
+                    end_dt = end_dt.replace(tzinfo=timezone.utc)
+
+                docs.append({
+                    "user_id":    ObjectId(user_id),       # matches schema
+                    "type":       "class",               # must be one of: class, deadline, exam, extracurricular
+                    "title":      e["course_name"],      # required field
+                    "course_code": e["course_code"],
+                    "days":       e["days"],
+                    "start_time":  start_dt,              # BSON Date
+                    "end_time":    end_dt,                # BSON Date or null
+                    "uploadedAt": datetime.now(timezone.utc)
+                })
+            except Exception as ex:
+                print(f"Error processing entry {e}: {ex}")
 
         if docs:
-            res = self.schedules.insert_many(docs)
-            print(f"Inserted {len(res.inserted_ids)} schedule entries.")
+            res = self.collection.insert_many(docs)
+            print(f"Inserted {len(res.inserted_ids)} entries.")
         else:
-            print("No schedule entries to insert.")
+            print("No valid entries to insert.")
 
     def close(self):
         self.client.close()
 
 
 def main():
-    parser = argparse.ArgumentParser(...)
+    parser = argparse.ArgumentParser(description="Extract a schedule and upload it to MongoDB.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--image", help="Path to schedule image file")
-    group.add_argument("--text",  help="Raw schedule text")
-    parser.add_argument("--firebase-uid", required=True)
-    parser.add_argument("--email",       required=True)
-    parser.add_argument("--name",        required=True)
-    parser.add_argument("--mongo-uri")
+    group.add_argument("--text", help="Raw schedule text")
+    parser.add_argument("--user", required=True, help="MongoDB user ObjectId")
+    parser.add_argument("--mongo-uri", help="MongoDB connection URI (overrides default and env var)")
     args = parser.parse_args()
 
-    schedule = extract_schedule(image_path=args.image, text=args.text)
+    if args.image:
+        schedule = extract_schedule(image_path=args.image)
+    else:
+        print("Text input not supported by extract_schedule function")
+        return
 
     uploader = ScheduleUploader(mongo_uri=args.mongo_uri)
-    user_id = uploader.get_or_create_user(
-        firebase_uid=args.firebase_uid,
-        email=args.email,
-        name=args.name
-    )
-    uploader.upload_schedule(user_id=user_id, schedule=schedule)
+    uploader.upload(user_id=args.user, schedule=schedule)
     uploader.close()
 
 if __name__ == "__main__":

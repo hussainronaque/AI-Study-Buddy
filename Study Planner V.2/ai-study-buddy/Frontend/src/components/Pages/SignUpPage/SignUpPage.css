@@ -129,7 +129,7 @@
 .signup-container{
     display: flex;
     gap: 10px;
-    margin: 50px auto;
+    margin: 30px auto;
 }
 
 .signup-container {
@@ -175,10 +175,15 @@
 .google-signin-container {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
 }
 
+.or {
+    display: flex;
+    justify-content: center;
+    font-size: large;
+    font-weight: bold;
+}
 #my-signin2 {
     width: 240px;
-    margin: 0 auto;
+    margin: 30px auto;
 }

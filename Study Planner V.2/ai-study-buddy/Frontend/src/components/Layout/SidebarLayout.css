@@ -1,0 +1,15 @@
+/* SidebarLayout.css */
+.layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* prevents layout-level horizontal scrolling */
+}
+
+.content {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* 💡 prevents horizontal scroll */
+  padding: 0px;
+  box-sizing: border-box;
+}

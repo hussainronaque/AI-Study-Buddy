@@ -8,6 +8,8 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const [recentNotes, setRecentNotes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [uploadedImage, setUploadedImage] = useState(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
 
     useEffect(() => {
         fetchRecentNotes();
@@ -32,29 +34,18 @@ const DashboardPage = () => {
         navigate('/');
     };
 
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setUploadedImage(file);
+            const imageUrl = URL.createObjectURL(file);
+            setImagePreviewUrl(imageUrl);
+        }
+    };
+
     return (
         <main className='main'>
 
-            <div className='sidebar'>
-
-                <div className="sidebar-logo">
-                    <img src={website_logo_transparent} alt="Logo"/>
-                </div>
-
-                <div className="sidebar-links">
-                    <button className="nav-item active">Dashboard</button>
-                    <button className="nav-item" onClick={() => navigate('/notes')}>Notes</button>
-                    <button className="nav-item">Calendar</button>
-                    <button className="nav-item">Tasks</button>
-                    <button className="nav-item">AI Assistant</button>
-                </div>
-
-                <button className="sidebar-logout-btn" onClick={handleLogout}>
-                    Logout
-                </button>
-
-            </div>
-                
             <div className="dashboard">
 
                 <div className="welcome-section">
@@ -99,6 +90,32 @@ const DashboardPage = () => {
                     </div>
 
                 </div>
+
+                {/* Image Preview Module */}
+                {imagePreviewUrl && (
+                    <div className="image-preview-module">
+                        <h3>Schedule</h3>
+                        <img src={imagePreviewUrl} alt="Uploaded Schedule" className="uploaded-image-preview" />
+                    </div>
+                )}
+
+                {/* Upload Button */}
+                <div className="upload-section">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        id="image-upload"
+                        style={{ display: 'none' }}
+                    />
+                    <label htmlFor="image-upload" className="dashboard-upload-btn">
+                        Upload Schedule
+                    </label>
+                </div>
+
+                {/* <button className="dashboard-upload-btn">
+                    Upload Schedule
+                </button> */}
 
             </div>
         

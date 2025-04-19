@@ -1,0 +1,71 @@
+.sidebar {
+    width: 18vw;
+    height: 100vh;
+    background-color: #42006C;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 0px 1px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow: hidden; /* prevent full sidebar from scrolling */
+  }
+  
+  .sidebar-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 2vh;
+  }
+  
+  .sidebar-logo img {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    object-fit: contain;
+  }
+  
+  .sidebar-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 14vw;
+    gap: 2vh;
+    overflow-y: auto;
+    flex-grow: 1; /* ✨ this allows it to take up extra space and scroll if needed */
+    margin-bottom: 2vh;
+  }
+  
+  .nav-item {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .nav-item:hover, .nav-item.active {
+    background: #9226c0;
+  }
+  
+  .sidebar-logout-btn {
+    background-color: #EFBF04;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s ease-in-out;
+    width: 100%;
+    max-width: 150px;
+  }
+  
+  .sidebar-logout-btn:hover {
+    background-color: #c0392b;
+  }
+  

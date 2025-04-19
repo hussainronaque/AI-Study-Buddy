@@ -74,6 +74,7 @@ const DashboardPage = () => {
                                 ))}
                             </div>
                         )}
+                        <button className="add-note-btn" onClick={() => navigate('/notes')}>Add New Note</button>
                     </div>
                     <div className="dashboard-card">
                         <h3>Upcoming Tasks</h3>

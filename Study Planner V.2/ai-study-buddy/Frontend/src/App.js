@@ -6,6 +6,7 @@ import OTPPage from './components/Pages/OTPPage/OTPPage';
 import NewPasswordPage from './components/Pages/NewPasswordPage/NewPasswordPage';
 import DashboardPage from './components/Pages/DashboardPage/DashboardPage';
 import NotesPage from './components/Pages/NotesPage/NotesPage';
+import SettingsPage from './components/Pages/SettingsPage/SettingsPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/otp" element={<OTPPage />} />
         <Route path="/new-password" element={<NewPasswordPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/notes" element={<NotesPage />} />
       </Routes>
     </Router>

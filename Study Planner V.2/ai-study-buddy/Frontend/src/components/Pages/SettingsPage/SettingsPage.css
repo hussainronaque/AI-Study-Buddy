@@ -1,0 +1,152 @@
+.main {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  width: 15vw;
+  background-color:  #42006C;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  margin-bottom: 2vh;
+}
+
+.sidebar-logo img {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  object-fit: contain;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  font-size: 100px;
+  width: 100%;
+  max-width: 14vw;
+  height: auto;
+  gap: 2vh;
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 24%;
+  border-radius: 8px;
+  transition: background 0.2s ease-in-out;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: #9226c0;
+}
+
+.sidebar-logout-btn {
+  background-color: #EFBF04;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: auto;
+  transition: background 0.2s ease-in-out;
+  width: 100%;
+  height: auto;
+  max-width: 250px;
+  margin-bottom: 2vh;
+}
+
+.sidebar-logout-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Dashboard Styling */
+.dashboard {
+  flex: 1;
+  background-color: #f4f6fa;
+  padding: 30px;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 85vw;
+}
+
+.welcome-section h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #2c3e50;
+}
+
+.welcome-section p {
+  margin-top: 5px;
+  color: #555;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.dashboard-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.recent-notes-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recent-note-item {
+  background-color: #f0f0f5;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.recent-note-item:hover {
+  background-color: #e0e0f0;
+}
+
+.recent-note-item h4 {
+  margin: 0 0 5px;
+}
+
+.recent-note-item p {
+  margin: 0 0 5px;
+  color: #666;
+}
+
+.recent-note-item small {
+  color: #999;
+}

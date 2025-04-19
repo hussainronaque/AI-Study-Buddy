@@ -8,9 +8,12 @@ import DashboardPage from './components/Pages/DashboardPage/DashboardPage';
 import NotesPage from './components/Pages/NotesPage/NotesPage';
 import SettingsPage from './components/Pages/SettingsPage/SettingsPage';
 import SidebarLayout from './components/Layout/SidebarLayout';
+import { AuthProvider } from './context/AuthContext';
+
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         {/* Public Routes */}
@@ -29,6 +32,7 @@ function App() {
         </Route>
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 

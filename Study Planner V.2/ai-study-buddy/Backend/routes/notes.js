@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const Note = require('../models/Note');
 const auth = require('../middleware/auth');
+const Note = require('../models/Note');
 
 // Get all notes for a user
 router.get('/', auth, async (req, res) => {
     try {
-        const notes = await Note.find({ userId: req.user.id })
-            .sort({ isPinned: -1, updatedAt: -1 });
+        console.log('Fetching notes for user:', req.user.id);
+        const notes = await Note.find({ user: req.user.id })
+            .sort({ updatedAt: -1 });
+        console.log('Found notes:', notes.length);
         res.json(notes);
     } catch (error) {
         console.error('Error fetching notes:', error);
@@ -18,9 +20,11 @@ router.get('/', auth, async (req, res) => {
 // Get recent notes for dashboard
 router.get('/recent', auth, async (req, res) => {
     try {
-        const notes = await Note.find({ userId: req.user.id })
+        console.log('Fetching recent notes for user:', req.user.id);
+        const notes = await Note.find({ user: req.user.id })
             .sort({ updatedAt: -1 })
             .limit(5);
+        console.log('Found recent notes:', notes.length);
         res.json(notes);
     } catch (error) {
         console.error('Error fetching recent notes:', error);
@@ -31,17 +35,16 @@ router.get('/recent', auth, async (req, res) => {
 // Create a new note
 router.post('/', auth, async (req, res) => {
     try {
-        const { title, content, category, tags, color } = req.body;
-        const note = new Note({
-            userId: req.user.id,
+        const { title, content, category, color } = req.body;
+        const newNote = new Note({
             title,
             content,
             category,
-            tags,
-            color
+            color,
+            user: req.user.id
         });
-        await note.save();
-        res.status(201).json(note);
+        const savedNote = await newNote.save();
+        res.json(savedNote);
     } catch (error) {
         console.error('Error creating note:', error);
         res.status(500).json({ message: 'Error creating note' });

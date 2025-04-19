@@ -4,9 +4,22 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const multer = require('multer');
 require('dotenv').config();
 
 const router = express.Router();
+
+// Configure Multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Directory to save uploaded files
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname); // Unique filename
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // SIGN UP
 router.post('/signup', async (req, res) => {
@@ -144,6 +157,24 @@ router.post('/reset-password', async (req, res) => {
     res.status(200).json({ message: 'Password reset successful' });
   } catch (err) {
     res.status(500).json({ message: 'Error resetting password', error: err.message });
+  }
+});
+
+// Upload schedule screenshot
+router.post('/upload-schedule', upload.single('schedule'), async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Save file path to user document
+    user.scheduleScreenshot = req.file.path;
+    await user.save();
+
+    res.status(200).json({ message: 'Schedule uploaded successfully', filePath: req.file.path });
+  } catch (err) {
+    res.status(500).json({ message: 'Error uploading schedule', error: err.message });
   }
 });
 

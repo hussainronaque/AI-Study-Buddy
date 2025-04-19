@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './NotesPage.css';
-import website_logo_transparent from '../../Assets/website-logo-transparent.png';
+import './NotesPage.css';
+import NoteCard from '../../Notes/NoteCard.jsx';
+import NoteForm from '../../Notes/NoteForm.jsx';
+import { useAuth } from '../../../context/AuthContext';
+
 
 const NotesPage = () => {
-    const navigate = useNavigate();
+    const { token } = useAuth();
     const [notes, setNotes] = useState([]);
     const [newNote, setNewNote] = useState({
         title: '',
@@ -25,7 +28,7 @@ const NotesPage = () => {
 
     useEffect(() => {
         fetchNotes();
-    }, []);
+    }, [token]);
 
     const fetchNotes = async () => {
         try {
@@ -39,11 +42,6 @@ const NotesPage = () => {
             setError('Error fetching notes');
             setLoading(false);
         }
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/');
     };
 
     const handleAddNote = async () => {
@@ -116,141 +114,66 @@ const NotesPage = () => {
     });
 
     return (
-        <div className="dashboard-container">
-            <nav className="dashboard-nav">
-                <div className="nav-logo">
-                    <img src={website_logo_transparent} alt="Logo" />
+        <div className="dashboard-main">
+            <div className="notes-header">
+                <h1>My Notes</h1>
+                <div className="notes-controls">
+                    <input
+                        type="text"
+                        placeholder="Search notes..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="search-input"
+                    />
+                    <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="category-select"
+                    >
+                        {categories.map(category => (
+                            <option key={category} value={category}>{category}</option>
+                        ))}
+                    </select>
+                    <button
+                        className={`archive-toggle ${showArchived ? 'active' : ''}`}
+                        onClick={() => setShowArchived(!showArchived)}
+                    >
+                        {showArchived ? 'Show Active' : 'Show Archived'}
+                    </button>
                 </div>
-                <div className="nav-links">
-                    <button className="nav-item" onClick={() => navigate('/dashboard')}>Dashboard</button>
-                    <button className="nav-item active">Notes</button>
-                    <button className="nav-item">Calendar</button>
-                    <button className="nav-item">Tasks</button>
-                    <button className="nav-item">AI Assistant</button>
-                </div>
-                <button className="logout-btn" onClick={handleLogout}>
-                    Logout
-                </button>
-            </nav>
+            </div>
 
-            <main className="dashboard-main">
-                <div className="notes-header">
-                    <h1>My Notes</h1>
-                    <div className="notes-controls">
-                        <input
-                            type="text"
-                            placeholder="Search notes..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="search-input"
-                        />
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="category-select"
-                        >
-                            {categories.map(category => (
-                                <option key={category} value={category}>{category}</option>
-                            ))}
-                        </select>
-                        <button
-                            className={`archive-toggle ${showArchived ? 'active' : ''}`}
-                            onClick={() => setShowArchived(!showArchived)}
-                        >
-                            {showArchived ? 'Show Active' : 'Show Archived'}
-                        </button>
-                    </div>
-                </div>
+            <div className="notes-container">
+                <NoteForm 
+                    note={newNote}
+                    onNoteChange={setNewNote}
+                    onSubmit={handleAddNote}
+                    categories={categories}
+                    colors={colors}
+                />
 
-                <div className="notes-container">
-                    <div className="notes-input-section">
-                        <input
-                            type="text"
-                            placeholder="Note Title"
-                            value={newNote.title}
-                            onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-                            className="note-title-input"
-                        />
-                        <textarea
-                            placeholder="Write your note here..."
-                            value={newNote.content}
-                            onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-                            className="note-content-input"
-                        />
-                        <div className="note-options">
-                            <select
-                                value={newNote.category}
-                                onChange={(e) => setNewNote({ ...newNote, category: e.target.value })}
-                                className="category-select"
-                            >
-                                {categories.filter(cat => cat !== 'All').map(category => (
-                                    <option key={category} value={category}>{category}</option>
-                                ))}
-                            </select>
-                            <div className="color-picker">
-                                {colors.map(color => (
-                                    <button
-                                        key={color}
-                                        className="color-option"
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => setNewNote({ ...newNote, color })}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                        <button className="add-note-btn" onClick={handleAddNote}>Add New Note</button>
-                    </div>
-
-                    <div className="notes-list">
-                        {loading ? (
-                            <div className="loading">Loading notes...</div>
-                        ) : error ? (
-                            <div className="error">{error}</div>
-                        ) : filteredNotes.length === 0 ? (
-                            <div className="no-notes">No notes found</div>
-                        ) : (
-                            filteredNotes.map(note => (
-                                <div
-                                    key={note._id}
-                                    className={`note-card ${note.isPinned ? 'pinned' : ''} ${note.isArchived ? 'archived' : ''}`}
-                                    style={{ backgroundColor: note.color }}
-                                >
-                                    <div className="note-header">
-                                        <h3>{note.title}</h3>
-                                        <div className="note-actions">
-                                            <button
-                                                className="pin-btn"
-                                                onClick={() => handleTogglePin(note._id)}
-                                            >
-                                                {note.isPinned ? '📌' : '📍'}
-                                            </button>
-                                            <button
-                                                className="archive-btn"
-                                                onClick={() => handleToggleArchive(note._id)}
-                                            >
-                                                {note.isArchived ? '📦' : '🗃️'}
-                                            </button>
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() => handleDeleteNote(note._id)}
-                                            >
-                                                🗑️
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <p>{note.content}</p>
-                                    <div className="note-footer">
-                                        <span className="note-category">{note.category}</span>
-                                        <small>{new Date(note.updatedAt).toLocaleString()}</small>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
+                <div className="notes-list">
+                    {loading ? (
+                        <div className="loading">Loading notes...</div>
+                    ) : error ? (
+                        <div className="error">{error}</div>
+                    ) : filteredNotes.length === 0 ? (
+                        <div className="no-notes">No notes found</div>
+                    ) : (
+                        filteredNotes.map(note => (
+                            <NoteCard
+                                key={note._id}
+                                note={note}
+                                onPin={handleTogglePin}
+                                onArchive={handleToggleArchive}
+                                onDelete={handleDeleteNote}
+                            />
+                        ))
+                    )}
                 </div>
-            </main>
+            </div>
         </div>
     );
 };
 
-export default NotesPage; 
+export default NotesPage;

@@ -2,6 +2,8 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/auth'; // backend URL
 
+const BASE_URL = 'http://localhost:5000/api'; // base URL for other API endpoints
+
 // Function to sign up a user
 export const signUp = async (userData) => {
   try {
@@ -23,8 +25,6 @@ export const login = async (userData) => {
     throw error;
   }
 };
-
-const BASE_UR = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export const notesApi = {
     getAllNotes: async (token) => {
@@ -72,6 +72,36 @@ export const notesApi = {
             }
         });
         if (!response.ok) throw new Error('Failed to delete note');
+        return response.json();
+    }
+};
+
+// ...existing code...
+
+export const scheduleApi = {
+    uploadSchedule: async (token, file) => {
+        const formData = new FormData();
+        formData.append('schedule', file);
+
+        const response = await fetch(`${BASE_URL}/schedules/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData
+        });
+        if (!response.ok) throw new Error('Failed to upload schedule');
+        return response.json();
+    },
+
+    getSchedules: async (token) => {
+        const response = await fetch(`${BASE_URL}/schedules`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch schedules');
         return response.json();
     }
 };

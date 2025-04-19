@@ -1,15 +1,9 @@
 const mongoose = require('mongoose');
 
 const noteSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
     title: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
     content: {
         type: String,
@@ -17,16 +11,16 @@ const noteSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['Study', 'Personal', 'Work', 'Other'],
         default: 'Study'
     },
-    tags: [{
-        type: String,
-        trim: true
-    }],
     color: {
         type: String,
         default: '#ffffff'
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     isPinned: {
         type: Boolean,
@@ -40,4 +34,4 @@ const noteSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Note', noteSchema); 
+module.exports = mongoose.model('Note', noteSchema);

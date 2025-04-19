@@ -122,6 +122,28 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* ...existing styles... */
+
+.schedule-section {
+    margin-top: 2rem;
+}
+
+.uploaded-image-preview {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    margin: 1rem 0;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.image-preview-module {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 0;
+}
+
 
 /* html, body {
     margin: 0;

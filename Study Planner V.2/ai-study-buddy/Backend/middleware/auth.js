@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config({ path: './Database/connection_string.env' });
+require('dotenv').config();
 
 module.exports = (req, res, next) => {
     try {
@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
             return res.status(401).json({ message: 'No authentication token, access denied' });
         }
 
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        const verified = jwt.verify(token, process.env.JWT_SECRET_KEY);
         req.user = { id: verified.id };
         next();
     } catch (err) {

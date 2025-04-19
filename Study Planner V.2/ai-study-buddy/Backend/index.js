@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config({ path: './Database/connection_string.env' });
+require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');

@@ -268,6 +268,11 @@ const StudyPlanPage = () => {
                                                     className="schedule-preview-image"
                                                 />
                                             </div>
+                                            <textarea 
+                                                readOnly
+                                                className="static-text-display"
+                                                value=""
+                                            />
                                             <div className="tasks-list">
                                                 <div className="tasks-header">
                                                     <h4>Tasks:</h4>

@@ -1,107 +1,191 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth'; // backend URL
+const API_URL = 'http://localhost:4000/api/auth';
+const SCHEDULE_URL = 'http://localhost:4000/api/schedules';
+const STUDY_PLANS_URL = 'http://localhost:4000/api/study-plans';
 
-const BASE_URL = 'http://localhost:5000/api'; // base URL for other API endpoints
+// This file will be implemented later with actual API endpoints
+// For now, it contains placeholder functions
 
-// Function to sign up a user
+// Auth related functions
 export const signUp = async (userData) => {
   try {
     const response = await axios.post(`${API_URL}/signup`, userData);
-    return response.data; // returns the response data from the server
+    return response.data;
   } catch (error) {
-    console.error('Signup error:', error.response?.data || error.message);
-    throw error;
+    throw error.response?.data || error;
   }
 };
 
-// Function to log in a user
-export const login = async (userData) => {
+export const login = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, userData);
-    return response.data; // returns the response data from the server (including token)
+    console.log('Making login request to:', `${API_URL}/login`);
+    console.log('With credentials:', credentials);
+    const response = await axios.post(`${API_URL}/login`, credentials);
+    return response.data;
   } catch (error) {
-    console.error('Login error:', error.response?.data || error.message);
-    throw error;
+    console.error('Login error details:', error.response?.data);
+    throw error.response?.data || error;
   }
 };
 
-export const notesApi = {
-    getAllNotes: async (token) => {
-        const response = await fetch(`${BASE_URL}/notes`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        if (!response.ok) throw new Error('Failed to fetch notes');
-        return response.json();
-    },
-
-    createNote: async (token, noteData) => {
-        const response = await fetch(`${BASE_URL}/notes`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(noteData)
-        });
-        if (!response.ok) throw new Error('Failed to create note');
-        return response.json();
-    },
-
-    updateNote: async (token, noteId, noteData) => {
-        const response = await fetch(`${BASE_URL}/notes/${noteId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(noteData)
-        });
-        if (!response.ok) throw new Error('Failed to update note');
-        return response.json();
-    },
-
-    deleteNote: async (token, noteId) => {
-        const response = await fetch(`${BASE_URL}/notes/${noteId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
-        });
-        if (!response.ok) throw new Error('Failed to delete note');
-        return response.json();
-    }
+export const forgotPassword = async (email) => {
+  try {
+    const response = await axios.post(`${API_URL}/forgot-password`, { email });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
 };
 
-// ...existing code...
+export const verifyOTP = async (email, otp) => {
+  try {
+    const response = await axios.post(`${API_URL}/verify-otp`, { email, otp });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
-export const scheduleApi = {
-    uploadSchedule: async (token, file) => {
-        const formData = new FormData();
-        formData.append('schedule', file);
+export const resetPassword = async (email, newPassword) => {
+  try {
+    const response = await axios.post(`${API_URL}/reset-password`, { email, newPassword });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
-        const response = await fetch(`${BASE_URL}/schedules/upload`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            body: formData
-        });
-        if (!response.ok) throw new Error('Failed to upload schedule');
-        return response.json();
-    },
-
-    getSchedules: async (token) => {
-        const response = await fetch(`${BASE_URL}/schedules`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        if (!response.ok) throw new Error('Failed to fetch schedules');
-        return response.json();
+// Notes related functions
+export const notesApi = {
+  getAllNotes: async (token) => {
+    try {
+      const response = await axios.get(`${API_URL}/notes`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
     }
+  },
+  createNote: async (token, noteData) => {
+    try {
+      const response = await axios.post(`${API_URL}/notes`, noteData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+  updateNote: async (token, noteId, noteData) => {
+    try {
+      const response = await axios.put(`${API_URL}/notes/${noteId}`, noteData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+  deleteNote: async (token, noteId) => {
+    try {
+      const response = await axios.delete(`${API_URL}/notes/${noteId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};
+
+// Schedule related functions
+export const scheduleApi = {
+  uploadSchedule: async (token, file) => {
+    try {
+      const formData = new FormData();
+      formData.append('schedule', file);
+      
+      console.log('Uploading file:', file.name); // Debug log
+      
+      const response = await axios.post(`${SCHEDULE_URL}/upload`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Upload API response:', response.data); // Debug log
+
+      // Make sure we're returning the data property of the response
+      return response.data;
+    } catch (error) {
+      console.error('Schedule upload error:', error.response?.data || error); // Debug log
+      throw error.response?.data || error;
+    }
+  },
+  getSchedules: async (token) => {
+    try {
+      const response = await axios.get(`${SCHEDULE_URL}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};
+
+// Study Plans related functions
+export const studyPlansApi = {
+  createPlan: async (token, planData) => {
+    try {
+      const response = await axios.post(STUDY_PLANS_URL, planData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+  
+  getPlans: async (token) => {
+    try {
+      const response = await axios.get(STUDY_PLANS_URL, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  updatePlan: async (token, planId, updateData) => {
+    try {
+      const response = await axios.put(`${STUDY_PLANS_URL}/${planId}`, updateData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  deletePlan: async (token, planId) => {
+    try {
+      const response = await axios.delete(`${STUDY_PLANS_URL}/${planId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
 };

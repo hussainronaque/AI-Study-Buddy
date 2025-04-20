@@ -11,27 +11,34 @@ const noteSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        default: 'Study'
+        required: true
     },
     color: {
         type: String,
-        default: '#ffffff'
-    },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        required: true,
+        match: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/
     },
     isPinned: {
         type: Boolean,
+        required: true,
         default: false
     },
     isArchived: {
         type: Boolean,
+        required: true,
         default: false
+    },
+    tags: [{
+        type: String
+    }],
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
-}, {
-    timestamps: true
-});
+}, { 
+    collection: 'notes',
+    timestamps: true // This will automatically manage createdAt and updatedAt
+}); 
 
-module.exports = mongoose.model('Note', noteSchema);
+module.exports = mongoose.model('Note', noteSchema); 

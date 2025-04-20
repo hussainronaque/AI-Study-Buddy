@@ -1,60 +1,70 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
-const fs = require('fs');
-const fileUpload = require('express-fileupload');
 const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
 
+// Import routes
 const authRoutes = require('./routes/auth');
-const notesRoutes = require('./routes/notes');
-const scheduleRoutes = require('./routes/schedule'); // Add this line
+const scheduleRoutes = require('./routes/schedules');
+const studyPlanRoutes = require('./routes/studyPlans');
 
 const app = express();
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads/schedules');
+fs.mkdirSync(uploadsDir, { recursive: true });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(fileUpload({
-    limits: { fileSize: 5 * 1024 * 1024 },
-    abortOnLimit: true,
-    createParentPath: true
-}));
+app.use('/uploads', express.static('uploads'));
 
+// Debug logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`, {
-      headers: req.headers,
-      body: req.method === 'POST' ? 'FILE DATA' : req.body
-  });
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.method === 'POST' ? req.body : 'N/A');
   next();
 });
 
-// Create uploads directory
-const uploadDir = './uploads';
-if (!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend is working!' });
+});
 
-// Serve uploaded files
-app.use('/uploads', express.static('uploads'));
-
-// Connect to MongoDB
+// Connect to MongoDB site_database
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    dbName: 'site_database'
 }).then(() => {
-    console.log('✅ MongoDB connected');
+    console.log('✅ MongoDB connected to site_database');
 }).catch(err => {
     console.error('❌ MongoDB connection error:', err);
 });
 
-// Use the routes
+// Register routes
 app.use('/api/auth', authRoutes);
-app.use('/api/notes', notesRoutes);
-app.use('/api/schedules', scheduleRoutes); // Add this line
+app.use('/api/schedules', scheduleRoutes);
+app.use('/api/study-plans', studyPlanRoutes);
+console.log('🛣️ Auth routes registered at /api/auth');
+console.log('🛣️ Schedule routes registered at /api/schedules');
+console.log('🛣️ Study Plan routes registered at /api/study-plans');
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('❌ Error:', err);
+    res.status(500).json({
+        message: 'Internal server error',
+        error: err.message
+    });
+});
 
 // Start server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📍 Test the server at http://localhost:${PORT}/api/test`);
 });

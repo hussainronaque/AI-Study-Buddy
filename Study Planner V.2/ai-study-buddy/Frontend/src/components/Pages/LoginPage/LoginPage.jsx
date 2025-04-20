@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { login } from '../../../utils/api';
+import { useAuth } from '../../../context/AuthContext';
 import './LoginPage.css';
 
 import email_icon from '../../Assets/email.png';
@@ -9,27 +10,65 @@ import website_logo_transparent from '../../Assets/website-logo-transparent.png'
 
 const LoginPage = () => {
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const location = useLocation();
+  const { login: authLogin } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    // Check for success message from signup
+    if (location.state?.message) {
+      setError(location.state.message);
+    }
+  }, [location]);
+
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError('All fields are required');
+      return false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', {
-        email,
-        password,
-      });
-
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
+      console.log('Attempting login with data:', formData);
+      const response = await login(formData);
+      if (response.token) {
+        authLogin(response.token);
         navigate('/dashboard');
-      } else {
-        setError('Invalid login credentials');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -44,30 +83,48 @@ const LoginPage = () => {
           <div className="underline"></div>
         </div>
 
-        <div className="inputs">
+        <form onSubmit={handleSubmit} className="inputs">
           <div className="input">
             <img src={email_icon} alt="email" />
-            <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="input">
             <img src={password_icon} alt="password" />
-            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
           </div>
-        </div>
 
-        {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
+          {error && <div className="error-message">{error}</div>}
 
-        <div className="login-prompt">
-          <Link to="/signup">Don't have an account? Sign Up</Link>
-        </div>
+          <div className="forgot-password">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </div>
 
-        <div className="login-prompt">
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </div>
+          <div className="signup-prompt">
+            <Link to="/signup">Don't have an account? Sign Up</Link>
+          </div>
 
-        <div className="signup-container" onClick={handleLogin}>
-          Login
-        </div>
+          <button
+            type="submit"
+            className={`submit-container ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import { scheduleApi } from '../../utils/api';
+import './scheduleUpload.css';
 
 const ScheduleUpload = ({ onUploadSuccess }) => {
     const [uploading, setUploading] = useState(false);
@@ -15,29 +16,16 @@ const ScheduleUpload = ({ onUploadSuccess }) => {
                 throw new Error('No file selected');
             }
 
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
+            const response = await scheduleApi.uploadSchedule(token, file);
 
-            const formData = new FormData();
-            formData.append('schedule', file);
-
-            console.log('Starting upload...');
-            
-            const response = await axios.post('http://localhost:4000/api/schedules/upload', formData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-
-            console.log('Upload response:', response.data);
-
-            if (response.data && response.data.imageUrl) {
-                onUploadSuccess(response.data.imageUrl);
+            if (response) {
+                onUploadSuccess({
+                    imageUrl: response.schedule.scheduleImage,
+                    schedule: response.schedule
+                });
                 alert('Schedule uploaded successfully!');
             } else {
-                throw new Error('No image URL in response');
+                throw new Error('No response data received');
             }
 
         } catch (error) {
@@ -49,21 +37,23 @@ const ScheduleUpload = ({ onUploadSuccess }) => {
     };
 
     return (
-        <div className="upload-section">
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleUpload}
-                disabled={uploading}
-                id="schedule-upload"
-                style={{ display: 'none' }}
-            />
-            <label 
-                htmlFor="schedule-upload" 
-                className="dashboard-upload-btn"
-            >
-                {uploading ? 'Uploading...' : 'Upload Schedule'}
-            </label>
+        <div className="schedule-upload-container">
+            <div className="upload-section">
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUpload}
+                    disabled={uploading}
+                    id="schedule-upload"
+                    className="upload-input"
+                />
+                <label 
+                    htmlFor="schedule-upload" 
+                    className={`upload-label ${uploading ? 'uploading' : ''}`}
+                >
+                    {uploading ? 'Uploading...' : 'Upload Schedule'}
+                </label>
+            </div>
         </div>
     );
 };

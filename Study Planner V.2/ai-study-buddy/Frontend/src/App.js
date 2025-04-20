@@ -7,6 +7,7 @@ import NewPasswordPage from './components/Pages/NewPasswordPage/NewPasswordPage'
 import DashboardPage from './components/Pages/DashboardPage/DashboardPage';
 import NotesPage from './components/Pages/NotesPage/NotesPage';
 import SettingsPage from './components/Pages/SettingsPage/SettingsPage';
+import StudyPlanPage from './components/Pages/StudyPlanPage/StudyPlanPage';
 import SidebarLayout from './components/Layout/SidebarLayout';
 import { AuthProvider } from './context/AuthContext';
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/study-plans" element={<StudyPlanPage />} />
         </Route>
       </Routes>
     </Router>

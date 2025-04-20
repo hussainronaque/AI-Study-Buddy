@@ -1,177 +1,29 @@
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import axios from 'axios';
-// import './DashboardPage.css';
-// import ScheduleUpload from '../../Schedule/scheduleUpload';
-// import { useAuth } from '../../../context/AuthContext';
-
-// const DashboardPage = () => {
-//     const navigate = useNavigate();
-//     const { logout } = useAuth();
-//     const [recentNotes, setRecentNotes] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [imagePreviewUrl, setImagePreviewUrl] = useState('');
-//     const [uploadedImage, setUploadedImage] = useState(null);
-
-//     useEffect(() => {
-//         fetchRecentNotes();
-//     }, []);
-
-//     const fetchRecentNotes = async () => {
-//         try {
-//             const token = localStorage.getItem('token');
-//             const response = await axios.get('http://localhost:4000/api/notes/recent', {
-//                 headers: { Authorization: `Bearer ${token}` }
-//             });
-//             setRecentNotes(response.data);
-//             setLoading(false);
-//         } catch (error) {
-//             console.error('Error fetching recent notes:', error);
-//             setLoading(false);
-//         }
-//     };
-
-//     const handleLogout = () => {
-//         logout();
-//         navigate('/');
-//     };
-
-//     const handleUploadSuccess = (imageUrl) => {
-//         setImagePreviewUrl(imageUrl);
-//     };
-
-//     return (
-//         <main className='main'>
-
-//             <div className="dashboard">
-
-//                 <div className="welcome-section">
-//                     <h1>Welcome to AI Study Buddy</h1>
-//                     <p>Manage your studies efficiently</p>
-//                 </div>
-
-//                 <div className="dashboard-grid">
-
-//                     <div className="dashboard-card">
-//                         <h3>Recent Notes</h3>
-//                         {loading ? (
-//                             <p>Loading notes...</p>
-//                         ) : recentNotes.length === 0 ? (
-//                             <p>No notes yet</p>
-//                         ) : (
-//                             <div className="recent-notes-list">
-//                                 {recentNotes.map(note => (
-//                                     <div key={note._id} className="recent-note-item" onClick={() => navigate('/notes')}>
-//                                         <h4>{note.title}</h4>
-//                                         <p>{note.content.substring(0, 50)}...</p>
-//                                         <small>{new Date(note.updatedAt).toLocaleDateString()}</small>
-//                                     </div>
-//                                 ))}
-//                             </div>
-//                         )}
-//                     </div>
-
-//                     {/* Schedule Card */}
-//                     <div className="dashboard-card schedule-section">
-//                         <h3>Class Schedule</h3>
-//                         {imagePreviewUrl ? (
-//                             <div className="image-preview-module">
-//                                 <img 
-//                                     src={imagePreviewUrl} 
-//                                     alt="Uploaded Schedule" 
-//                                     className="uploaded-image-preview" 
-//                                 />
-//                             </div>
-//                         ) : (
-//                             <p>No schedule uploaded yet</p>
-//                         )}
-//                         <ScheduleUpload onUploadSuccess={handleUploadSuccess} />
-//                     </div>
-
-//                     <div className="dashboard-card">
-//                         <h3>Upcoming Tasks</h3>
-//                         <p>No tasks scheduled</p>
-//                     </div>
-
-//                     <div className="dashboard-card">
-//                         <h3>Calendar Events</h3>
-//                         <p>No upcoming events</p>
-//                     </div>
-
-//                     <div className="dashboard-card">
-//                         <h3>AI Study Tips</h3>
-//                         <p>Ask AI for study recommendations</p>
-//                     </div>
-
-//                 </div>
-
-//                 {/* Image Preview Module */}
-//                 {imagePreviewUrl && (
-//                     <div className="image-preview-module">
-//                         <h3>Schedule</h3>
-//                         <img src={imagePreviewUrl} alt="Uploaded Schedule" className="uploaded-image-preview" />
-//                     </div>
-//                 )}
-
-//                 {/* Upload Button */}
-//                 <div className="upload-section">
-//                     <input
-//                         type="file"
-//                         accept="image/*"
-//                         onChange={handleImageUpload}
-//                         id="image-upload"
-//                         style={{ display: 'none' }}
-//                     />
-//                     <label htmlFor="image-upload" className="dashboard-upload-btn">
-//                         Upload Schedule
-//                     </label>
-//                 </div>
-
-//                 <div className="mb-6">
-//                     <h2 className="text-xl font-semibold mb-4">Your Schedule</h2>
-//                     <ScheduleUpload />
-//                 </div>
-
-//                     <div className="dashboard-card schedule-section">
-//                         <h3>Class Schedule</h3>
-//                         {imagePreviewUrl ? (
-//                             <div className="image-preview-module">
-//                                 <img 
-//                                     src={imagePreviewUrl} 
-//                                     alt="Uploaded Schedule" 
-//                                     className="uploaded-image-preview" 
-//                                 />
-//                             </div>
-//                         ) : (
-//                             <p>No schedule uploaded yet</p>
-//                         )}
-//                         <ScheduleUpload onUploadSuccess={handleUploadSuccess} />
-//                     </div>
-
-//             </div>
-        
-//         </main>
-//     );
-// };
-
-// export default DashboardPage;
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './DashboardPage.css';
-import ScheduleUpload from '../../Schedule/scheduleUpload';
 import { useAuth } from '../../../context/AuthContext';
-import { useCallback } from 'react';
+import { studyPlansApi } from '../../../utils/api';
 
 const DashboardPage = () => {
     const navigate = useNavigate();
     const { token } = useAuth();
     const [recentNotes, setRecentNotes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
     const [error, setError] = useState(null);
+    const [studyPlan, setStudyPlan] = useState(null);
+    const [loadingPlan, setLoadingPlan] = useState(true);
+
+    // Format date for display
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     const fetchRecentNotes = useCallback(async () => {
         try {
@@ -192,16 +44,25 @@ const DashboardPage = () => {
         }
     }, [token]);
 
+    const fetchLatestStudyPlan = useCallback(async () => {
+        try {
+            const response = await studyPlansApi.getPlans(token);
+            if (response && response.length > 0) {
+                setStudyPlan(response[0]); // Get the most recent plan
+            }
+            setLoadingPlan(false);
+        } catch (error) {
+            console.error('Error fetching study plan:', error);
+            setLoadingPlan(false);
+        }
+    }, [token]);
+
     useEffect(() => {
         if (token) {
             fetchRecentNotes();
+            fetchLatestStudyPlan();
         }
-    }, [fetchRecentNotes, token]);
-
-    const handleUploadSuccess = (imageUrl) => {
-        setImagePreviewUrl(imageUrl);
-    };
-
+    }, [fetchRecentNotes, fetchLatestStudyPlan, token]);
 
     return (
         <main className='main'>
@@ -210,6 +71,63 @@ const DashboardPage = () => {
                     <h1>Welcome to AI Study Buddy</h1>
                     <p>Manage your studies efficiently</p>
                 </div>
+
+                {/* Study Plan Preview Window */}
+                {studyPlan ? (
+                    <div className="study-plan-preview">
+                        <div className="study-plan-header">
+                            <h2>Latest Study Plan</h2>
+                        </div>
+                        <div className="study-plan-content">
+                            {loadingPlan ? (
+                                <p>Loading study plan...</p>
+                            ) : (
+                                <div className="active-plan">
+                                    <div className="plan-details">
+                                        <div className="plan-schedule">
+                                            <img 
+                                                src={studyPlan.scheduleImage} 
+                                                alt="Study Schedule" 
+                                                className="schedule-preview-image"
+                                            />
+                                        </div>
+                                        <div className="plan-tasks">
+                                            <h3>Tasks:</h3>
+                                            <ul className="tasks-preview-list">
+                                                {studyPlan.tasks.map((task, index) => (
+                                                    <li key={index} className="task-preview-item">
+                                                        <span className="task-name">{task.name}</span>
+                                                        <span className="task-deadline">
+                                                            Due: {formatDate(task.end_time)}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        className="view-plan-btn"
+                                        onClick={() => navigate('/study-plans')}
+                                    >
+                                        View All Plans
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="study-plan-preview">
+                        <div className="no-plan">
+                            <p>You haven't created a study plan yet. Create one to start organizing your study sessions effectively!</p>
+                            <button 
+                                className="create-plan-btn"
+                                onClick={() => navigate('/study-plans')}
+                            >
+                                Create New Plan
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="dashboard-grid">
                     {/* Recent Notes Card */}
@@ -230,23 +148,6 @@ const DashboardPage = () => {
                                 ))}
                             </div>
                         )}
-                    </div>
-
-                    {/* Schedule Card */}
-                    <div className="dashboard-card schedule-section">
-                        <h3>Class Schedule</h3>
-                        {imagePreviewUrl ? (
-                            <div className="image-preview-module">
-                                <img 
-                                    src={imagePreviewUrl} 
-                                    alt="Uploaded Schedule" 
-                                    className="uploaded-image-preview" 
-                                />
-                            </div>
-                        ) : (
-                            <p>No schedule uploaded yet</p>
-                        )}
-                        <ScheduleUpload onUploadSuccess={handleUploadSuccess} />
                     </div>
 
                     {/* Other Dashboard Cards */}
@@ -271,101 +172,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import axios from 'axios';
-// import './DashboardPage.css';
-// import website_logo_transparent from '../../Assets/website-logo-transparent.png';
-
-// const DashboardPage = () => {
-//     const navigate = useNavigate();
-//     const [recentNotes, setRecentNotes] = useState([]);
-//     const [loading, setLoading] = useState(true);
-
-//     useEffect(() => {
-//         fetchRecentNotes();
-//     }, []);
-
-//     const fetchRecentNotes = async () => {
-//         try {
-//             const token = localStorage.getItem('token');
-//             const response = await axios.get('http://localhost:4000/api/notes/recent', {
-//                 headers: { Authorization: `Bearer ${token}` }
-//             });
-//             setRecentNotes(response.data);
-//             setLoading(false);
-//         } catch (error) {
-//             console.error('Error fetching recent notes:', error);
-//             setLoading(false);
-//         }
-//     };
-
-//     const handleLogout = () => {
-//         localStorage.removeItem('token');
-//         navigate('/');
-//     };
-
-//     return (
-//         <div className="dashboard-container">
-//             <nav className="dashboard-nav">
-//                 <div className="nav-logo">
-//                     <img src={website_logo_transparent} alt="Logo" />
-//                 </div>
-//                 <div className="nav-links">
-//                     <button className="nav-item active">Dashboard</button>
-//                     <button className="nav-item" onClick={() => navigate('/notes')}>Notes</button>
-//                     <button className="nav-item">Calendar</button>
-//                     <button className="nav-item">Tasks</button>
-//                     <button className="nav-item">AI Assistant</button>
-//                 </div>
-//                 <button className="logout-btn" onClick={handleLogout}>
-//                     Logout
-//                 </button>
-//             </nav>
-
-//             <main className="dashboard-main">
-//                 <div className="welcome-section">
-//                     <h1>Welcome to AI Study Buddy</h1>
-//                     <p>Manage your studies efficiently</p>
-//                 </div>
-
-//                 <div className="dashboard-grid">
-//                     <div className="dashboard-card">
-//                         <h3>Recent Notes</h3>
-//                         {loading ? (
-//                             <p>Loading notes...</p>
-//                         ) : recentNotes.length === 0 ? (
-//                             <p>No notes yet</p>
-//                         ) : (
-//                             <div className="recent-notes-list">
-//                                 {recentNotes.map(note => (
-//                                     <div key={note._id} className="recent-note-item" onClick={() => navigate('/notes')}>
-//                                         <h4>{note.title}</h4>
-//                                         <p>{note.content.substring(0, 50)}...</p>
-//                                         <small>{new Date(note.updatedAt).toLocaleDateString()}</small>
-//                                     </div>
-//                                 ))}
-//                             </div>
-//                         )}
-//                         <button className="add-note-btn" onClick={() => navigate('/notes')}>Add New Note</button>
-//                     </div>
-//                     <div className="dashboard-card">
-//                         <h3>Upcoming Tasks</h3>
-//                         <p>No tasks scheduled</p>
-//                     </div>
-//                     <div className="dashboard-card">
-//                         <h3>Calendar Events</h3>
-//                         <p>No upcoming events</p>
-//                     </div>
-//                     <div className="dashboard-card">
-//                         <h3>AI Study Tips</h3>
-//                         <p>Ask AI for study recommendations</p>
-//                     </div>
-//                 </div>
-//             </main>
-//         </div>
-//     );
-// };
-
-// export default DashboardPage;

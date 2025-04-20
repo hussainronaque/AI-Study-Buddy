@@ -1,0 +1,161 @@
+{
+  "users": {
+    "bsonType": "object",
+    "required": [
+      "username",
+      "email",
+      "password"
+    ],
+    "properties": {
+      "username": {
+        "bsonType": "string"
+      },
+      "email": {
+        "bsonType": "string",
+        "pattern": "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+      },
+      "password": {
+        "bsonType": "string"
+      }
+    }
+  },
+  "settings": {
+    "bsonType": "object",
+    "required": [
+      "userId",
+      "backgroundColor",
+      "sidebarColor"
+    ],
+    "properties": {
+      "userId": {
+        "bsonType": "objectId"
+      },
+      "backgroundColor": {
+        "bsonType": "string",
+        "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$"
+      },
+      "sidebarColor": {
+        "bsonType": "string",
+        "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$"
+      }
+    }
+  },
+  "notes": {
+    "bsonType": "object",
+    "required": [
+      "_id",
+      "__v",
+      "category",
+      "color",
+      "content",
+      "createdAt",
+      "isArchived",
+      "isPinned",
+      "title",
+      "updatedAt",
+      "userId"
+    ],
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "__v": {
+        "bsonType": "int"
+      },
+      "category": {
+        "bsonType": "string"
+      },
+      "color": {
+        "bsonType": "string",
+        "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$"
+      },
+      "content": {
+        "bsonType": "string"
+      },
+      "createdAt": {
+        "bsonType": "date"
+      },
+      "updatedAt": {
+        "bsonType": "date"
+      },
+      "isArchived": {
+        "bsonType": "bool"
+      },
+      "isPinned": {
+        "bsonType": "bool"
+      },
+      "title": {
+        "bsonType": "string"
+      },
+      "tags": {
+        "bsonType": "array",
+        "items": {
+          "bsonType": "string"
+        }
+      },
+      "user": {
+        "bsonType": "objectId"
+      },
+      "userId": {
+        "bsonType": "objectId"
+      }
+    }
+  },
+  "schedules": {
+    "bsonType": "object",
+    "required": [
+      "userId",
+      "scheduleNumber",
+      "scheduleImage"
+    ],
+    "properties": {
+      "userId": {
+        "bsonType": "objectId"
+      },
+      "scheduleNumber": {
+        "bsonType": "int"
+      },
+      "scheduleImage": {
+        "bsonType": "string"
+      }
+    }
+  },
+  "study_plans": {
+    "bsonType": "object",
+    "required": [
+      "userId",
+      "scheduleNumber",
+      "studyPlanNumber",
+      "tasks"
+    ],
+    "properties": {
+      "userId": {
+        "bsonType": "objectId"
+      },
+      "scheduleNumber": {
+        "bsonType": "int"
+      },
+      "studyPlanNumber": {
+        "bsonType": "int"
+      },
+      "tasks": {
+        "bsonType": "array",
+        "items": {
+          "bsonType": "object",
+          "required": [
+            "name",
+            "deadline"
+          ],
+          "properties": {
+            "name": {
+              "bsonType": "string"
+            },
+            "deadline": {
+              "bsonType": "date"
+            }
+          }
+        }
+      }
+    }
+  }
+}

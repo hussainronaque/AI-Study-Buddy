@@ -144,7 +144,6 @@
     margin: 1rem 0;
 }
 
-
 /* html, body {
     margin: 0;
     padding: 0;
@@ -386,4 +385,217 @@
 
 .logout-btn:hover {
     background: #d6a904;
-} */
+}
+
+/* Study Plan Section */
+.study-plan-section {
+  background: linear-gradient(135deg, #42006C 0%, #570091 100%);
+  color: white;
+}
+
+.study-plan-section h3 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+.study-plan-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.active-plan {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.active-plan h4 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.active-plan p {
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+}
+
+.no-plan {
+  text-align: center;
+  padding: 20px;
+}
+
+.no-plan p {
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+}
+
+.create-plan-btn, .view-plan-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-plan-btn {
+  background-color: #42006C;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-top: auto;
+  align-self: center;
+}
+
+.create-plan-btn:hover {
+  background-color: #9226c0;
+}
+
+.view-plan-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+}
+
+.view-plan-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Study Plan Preview Styles */
+.study-plan-preview {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.study-plan-header {
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.study-plan-header h2 {
+    color: #333;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.study-plan-content {
+    min-height: 200px;
+}
+
+.active-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.plan-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.plan-schedule {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    background: #f8f8f8;
+}
+
+.schedule-preview-image {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.plan-tasks {
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.plan-tasks h3 {
+    margin-top: 0;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.tasks-preview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.task-preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+}
+
+.task-preview-item:last-child {
+    border-bottom: none;
+}
+
+.task-name {
+    font-weight: 500;
+    color: #444;
+}
+
+.task-deadline {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.view-plan-btn, .create-plan-btn {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    width: fit-content;
+    align-self: center;
+}
+
+.view-plan-btn:hover, .create-plan-btn:hover {
+    background-color: #357abd;
+}
+
+.no-plan {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+}
+
+.no-plan p {
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .plan-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .task-preview-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}

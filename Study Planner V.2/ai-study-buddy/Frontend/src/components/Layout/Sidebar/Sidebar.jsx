@@ -19,10 +19,8 @@ const Sidebar = () => {
       </div>
       <div className="sidebar-links">
         <button className="nav-item" onClick={() => navigate('/dashboard')}>Dashboard</button>
+        <button className="nav-item" onClick={() => navigate('/study-plans')}>Study Plans</button>
         <button className="nav-item" onClick={() => navigate('/notes')}>Notes</button>
-        <button className="nav-item">Calendar</button>
-        <button className="nav-item">Tasks</button>
-        <button className="nav-item">AI Assistant</button>
       </div>
       <button className="sidebar-logout-btn" onClick={handleLogout}>Logout</button>
     </div>

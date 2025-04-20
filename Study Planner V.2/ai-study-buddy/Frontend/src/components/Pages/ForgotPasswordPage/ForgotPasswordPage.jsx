@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { forgotPassword } from '../../../utils/api';
 import './ForgotPasswordPage.css';
 
 import email_icon from '../../Assets/email.png';
@@ -13,22 +13,34 @@ const ForgotPasswordPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const submithandleclick = async () => {
-        try {
-            setLoading(true);
-            setError('');
-            
-            const response = await axios.post('http://localhost:4000/api/auth/forgot-password', {
-                email: email
-            });
+    const validateEmail = () => {
+        if (!email) {
+            setError('Email is required');
+            return false;
+        }
 
-            if (response.data.message === 'OTP sent to your email') {
-                navigate('/otp', { state: { email: email } });
-            } else {
-                setError(response.data.message || 'Failed to send OTP');
-            }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError('Please enter a valid email address');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (!validateEmail()) {
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await forgotPassword(email);
+            navigate('/otp', { state: { email } });
         } catch (err) {
-            setError(err.response?.data?.message || 'Something went wrong');
+            setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -37,11 +49,11 @@ const ForgotPasswordPage = () => {
     return (
         <div className='page-container'>
             <Link to="/" className='back-button'>
-                <img src={back_arrow} alt="" />
+                <img src={back_arrow} alt="Back" />
             </Link>
 
             <div className='website-logo'>
-                <img src={website_logo_transparent} alt="" />
+                <img src={website_logo_transparent} alt="Logo" />
             </div>
             
             <div className='content-container'>
@@ -52,31 +64,33 @@ const ForgotPasswordPage = () => {
                     <div className='underline'></div>
                 </div>
 
-                <div className='inputs'>
+                <form onSubmit={handleSubmit} className='inputs'>
                     <div className='text_2'>
                         Please enter your Email for password authentication.
                     </div>
 
                     <div className='input'>
-                        <img src={email_icon} alt="" />
+                        <img src={email_icon} alt="Email" />
                         <input 
                             name='email' 
                             type="email" 
                             placeholder='Email'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            required
                         />
                     </div>
                     
                     {error && <div className="error-message">{error}</div>}
-                </div>
 
-                <div 
-                    className={`forgot-container ${loading ? 'loading' : ''}`} 
-                    onClick={submithandleclick}
-                >
-                    {loading ? 'Sending...' : 'Submit'}
-                </div>
+                    <button
+                        type="submit"
+                        className={`submit-container ${loading ? 'loading' : ''}`}
+                        disabled={loading}
+                    >
+                        {loading ? 'Sending...' : 'Submit'}
+                    </button>
+                </form>
             </div>
         </div>
     );

@@ -1,32 +1,22 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true // Ensures that the username is unique
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true // Ensures that the email is unique
-  },
-  password: {
-    type: String,
-    required: true // Password is required
-  },
-  resetPasswordOTP: {
-    type: String,
-    default: undefined
-  },
-  resetPasswordExpires: {
-    type: Date,
-    default: undefined
-  }
-});
+    username: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    resetPasswordOTP: String,
+    resetPasswordExpires: Date
+}, { collection: 'users' }); // Explicitly specify the collection name
 
-// Create the User model
-const User = mongoose.model('User', userSchema);
-
-// Export the model so you can use it in other parts of the application
-module.exports = User;
+module.exports = mongoose.model('User', userSchema); 

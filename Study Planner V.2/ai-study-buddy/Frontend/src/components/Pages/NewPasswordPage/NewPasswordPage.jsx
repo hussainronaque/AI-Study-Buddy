@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { resetPassword } from '../../../utils/api';
 import './NewPasswordPage.css';
 
 import password_icon from '../../Assets/password.png';
@@ -10,8 +10,10 @@ import back_arrow from '../../Assets/Back-Arrow.png'
 const NewPasswordPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [formData, setFormData] = useState({
+        password: '',
+        confirmPassword: ''
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const email = location.state?.email;
@@ -23,34 +25,37 @@ const NewPasswordPage = () => {
         }
     }, [navigate, email]);
 
-    const handleSubmit = async () => {
-        if (!password || !confirmPassword) {
-            setError('Please fill in all fields');
-            return;
+    const validateForm = () => {
+        if (!formData.password || !formData.confirmPassword) {
+            setError('All fields are required');
+            return false;
         }
 
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
-
-        if (password.length < 6) {
+        if (formData.password.length < 6) {
             setError('Password must be at least 6 characters long');
+            return false;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (!validateForm()) {
             return;
         }
 
         setLoading(true);
-        setError('');
-
         try {
-            const response = await axios.post('http://localhost:4000/api/auth/reset-password', {
-                email,
-                newPassword: password
-            });
-            
-            // Show success message and redirect
-            alert('Password reset successful! Please login with your new password.');
-            navigate('/');
+            await resetPassword(email, formData.password);
+            navigate('/login', { state: { message: 'Password reset successful! Please login with your new password.' } });
         } catch (err) {
             setError(err.response?.data?.message || 'Error resetting password. Please try again.');
         } finally {
@@ -58,14 +63,22 @@ const NewPasswordPage = () => {
         }
     };
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     return (
         <div className='page-container'>
             <Link to="/otp" className='back-button'>
-                <img src={back_arrow} alt="" />
+                <img src={back_arrow} alt="Back" />
             </Link>
 
             <div className='website-logo'>
-                <img src={website_logo_transparent} alt="" />
+                <img src={website_logo_transparent} alt="Logo" />
             </div>
             
             <div className='content-container'>
@@ -76,42 +89,45 @@ const NewPasswordPage = () => {
                     <div className='underline'></div>
                 </div>
 
-                <div className='inputs'>
+                <form onSubmit={handleSubmit} className='inputs'>
                     <div className='text_2'>
                         Please enter your new password.
                     </div>
 
                     <div className='input'>
-                        <img src={password_icon} alt="" />
+                        <img src={password_icon} alt="Password" />
                         <input 
                             name='password' 
                             type="password" 
                             placeholder='New Password'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
                     <div className='input'>
-                        <img src={password_icon} alt="" />
+                        <img src={password_icon} alt="Confirm Password" />
                         <input 
-                            name='confirm-password' 
+                            name='confirmPassword' 
                             type="password" 
                             placeholder='Confirm Password'
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
                     {error && <div className="error-message">{error}</div>}
-                </div>
 
-                <div 
-                    className={`submit-container ${loading ? 'loading' : ''}`}
-                    onClick={handleSubmit}
-                >
-                    {loading ? 'Resetting...' : 'Reset Password'}
-                </div>
+                    <button
+                        type="submit"
+                        className={`submit-container ${loading ? 'loading' : ''}`}
+                        disabled={loading}
+                    >
+                        {loading ? 'Resetting...' : 'Reset Password'}
+                    </button>
+                </form>
             </div>
         </div>
     );

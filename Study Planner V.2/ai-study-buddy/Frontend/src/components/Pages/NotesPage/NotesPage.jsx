@@ -67,7 +67,6 @@ const NotesPage = () => {
 
     const handleDeleteNote = async (id) => {
         try {
-            const token = localStorage.getItem('token');
             await axios.delete(`http://localhost:4000/api/notes/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -114,65 +113,67 @@ const NotesPage = () => {
     });
 
     return (
-        <div className="dashboard-main">
-            <div className="notes-header">
-                <h1>My Notes</h1>
-                <div className="notes-controls">
-                    <input
-                        type="text"
-                        placeholder="Search notes..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="search-input"
+        <main className='main'>
+            <div className="dashboard">
+                <div className="notes-header">
+                    <h1>My Notes</h1>
+                    <div className="notes-controls">
+                        <input
+                            type="text"
+                            placeholder="Search notes..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="category-select"
+                        >
+                            {categories.map(category => (
+                                <option key={category} value={category}>{category}</option>
+                            ))}
+                        </select>
+                        <button
+                            className={`archive-toggle ${showArchived ? 'active' : ''}`}
+                            onClick={() => setShowArchived(!showArchived)}
+                        >
+                            {showArchived ? 'Show Active' : 'Show Archived'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="notes-container">
+                    <NoteForm 
+                        note={newNote}
+                        onNoteChange={setNewNote}
+                        onSubmit={handleAddNote}
+                        categories={categories}
+                        colors={colors}
                     />
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="category-select"
-                    >
-                        {categories.map(category => (
-                            <option key={category} value={category}>{category}</option>
-                        ))}
-                    </select>
-                    <button
-                        className={`archive-toggle ${showArchived ? 'active' : ''}`}
-                        onClick={() => setShowArchived(!showArchived)}
-                    >
-                        {showArchived ? 'Show Active' : 'Show Archived'}
-                    </button>
+
+                    <div className="notes-list">
+                        {loading ? (
+                            <div className="loading">Loading notes...</div>
+                        ) : error ? (
+                            <div className="error">{error}</div>
+                        ) : filteredNotes.length === 0 ? (
+                            <div className="no-notes">No notes found</div>
+                        ) : (
+                            filteredNotes.map(note => (
+                                <NoteCard
+                                    key={note._id}
+                                    note={note}
+                                    onPin={handleTogglePin}
+                                    onArchive={handleToggleArchive}
+                                    onDelete={handleDeleteNote}
+                                />
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
-
-            <div className="notes-container">
-                <NoteForm 
-                    note={newNote}
-                    onNoteChange={setNewNote}
-                    onSubmit={handleAddNote}
-                    categories={categories}
-                    colors={colors}
-                />
-
-                <div className="notes-list">
-                    {loading ? (
-                        <div className="loading">Loading notes...</div>
-                    ) : error ? (
-                        <div className="error">{error}</div>
-                    ) : filteredNotes.length === 0 ? (
-                        <div className="no-notes">No notes found</div>
-                    ) : (
-                        filteredNotes.map(note => (
-                            <NoteCard
-                                key={note._id}
-                                note={note}
-                                onPin={handleTogglePin}
-                                onArchive={handleToggleArchive}
-                                onDelete={handleDeleteNote}
-                            />
-                        ))
-                    )}
-                </div>
-            </div>
-        </div>
+        </main>
     );
 };
 

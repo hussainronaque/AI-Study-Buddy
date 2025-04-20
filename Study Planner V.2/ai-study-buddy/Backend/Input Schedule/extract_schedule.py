@@ -2,14 +2,18 @@ import os
 import json
 import base64
 from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class ColumnBasedScheduleProcessor:
     def __init__(self):
         """
         Initialize the Schedule Processor with OpenAI client
         """
-        self.api_key = "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"
-        self.client = OpenAI(api_key=self.api_key)
+        # Fill manually or use environment variable
+        # self.api_key = 
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = "gpt-4.1-nano-2025-04-14"
 
     def encode_image(self, image_path):

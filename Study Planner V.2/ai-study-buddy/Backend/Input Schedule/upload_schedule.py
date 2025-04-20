@@ -11,12 +11,12 @@ from extract_schedule import extract_schedule
 DEFAULT_MONGO_URI = "mongodb+srv://shayaanqazi:shDjocJeMTuQHA8K@cluster0.57on7ed.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 class ScheduleUploader:
-    def __init__(self, mongo_uri=None, db_name="ai_study_planner_db"):
+    def __init__(self, mongo_uri=None, db_name="site_database"):
         # Use the default URI if none is provided
         self.mongo_uri = mongo_uri or os.getenv("MONGODB_URI") or DEFAULT_MONGO_URI
         self.client = MongoClient(self.mongo_uri, serverSelectionTimeoutMS=5000)
         self.db = self.client[db_name]
-        self.collection = self.db["schedules"]
+        self.collection = self.db["courses"]
 
     def upload(self, user_id, schedule):
         docs = []

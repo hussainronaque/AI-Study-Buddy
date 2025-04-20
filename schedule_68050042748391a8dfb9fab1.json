@@ -1,0 +1,44 @@
+[
+  {
+    "course_code": "CS/CE 353/374",
+    "course_name": "Software Engineering",
+    "days": "MWF",
+    "start_time": "10:00AM",
+    "end_time": "11:15AM"
+  },
+  {
+    "course_code": "CS 334",
+    "course_name": "Competitive Programming",
+    "days": "MW",
+    "start_time": "10:00AM",
+    "end_time": "11:15AM"
+  },
+  {
+    "course_code": "MGMT 301",
+    "course_name": "Tech. Mgmt & Entrepreneurship",
+    "days": "TR",
+    "start_time": "11:30AM",
+    "end_time": "12:45PM"
+  },
+  {
+    "course_code": "CS/CE 412/471",
+    "course_name": "Algorithms: Design & Analysis",
+    "days": "MWF",
+    "start_time": "2:00PM",
+    "end_time": "3:45PM"
+  },
+  {
+    "course_code": "PHIL 122",
+    "course_name": "Introduction to Western Philos",
+    "days": "TR",
+    "start_time": "2:25PM",
+    "end_time": "3:40PM"
+  },
+  {
+    "course_code": "CS 334L",
+    "course_name": "Competitive Programming Lab",
+    "days": "F",
+    "start_time": "3:30PM",
+    "end_time": "6:30PM"
+  }
+]

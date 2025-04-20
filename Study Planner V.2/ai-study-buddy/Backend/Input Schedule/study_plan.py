@@ -17,17 +17,17 @@ def connect_to_mongodb():
     mongo_client = pymongo.MongoClient(
         "mongodb+srv://shayaanqazi:shDjocJeMTuQHA8K@cluster0.57on7ed.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
     )
-    db = mongo_client["ai_study_planner_db"]
+    db = mongo_client["site_database"]
     return db
 
 
-def get_user_schedule(db, user_id):
+def get_user_schedule(db, userId):
     """Retrieve the user's schedule from MongoDB."""
     try:
-        user_id_obj = ObjectId(user_id)
-        schedules = db.schedules.find({"user_id": user_id_obj})
+        user_id_obj = ObjectId(userId)
+        schedules = db.schedules.find({"userId": user_id_obj})
         schedule_list = list(schedules)
-        print(f"Found {len(schedule_list)} schedule items for user ID: {user_id}")
+        print(f"Found {len(schedule_list)} schedule items for user ID: {userId}")
         return schedule_list
     except Exception as e:
         print(f"Error querying MongoDB: {e}")
@@ -207,7 +207,7 @@ def main():
     ]
 
     db      = connect_to_mongodb()
-    user_id = "67f22c2dc64e0a2c11f0d952"
+    user_id = "68050042748391a8dfb9fab1"
 
     print(f"Looking for schedules with user_id: {user_id}")
     raw_schedule      = get_user_schedule(db, user_id)

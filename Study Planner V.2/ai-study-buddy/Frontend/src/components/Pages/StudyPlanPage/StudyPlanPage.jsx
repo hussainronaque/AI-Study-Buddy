@@ -20,6 +20,7 @@ const StudyPlanPage = () => {
     const [hasUploadedSchedule, setHasUploadedSchedule] = useState(false);
     const [editingPlanId, setEditingPlanId] = useState(null);
     const [editingTasks, setEditingTasks] = useState([]);
+    const [aiGeneratedPlans, setAiGeneratedPlans] = useState({});
 
     // Fetch study plans
     const fetchStudyPlans = useCallback(async () => {
@@ -27,18 +28,52 @@ const StudyPlanPage = () => {
             const response = await studyPlansApi.getPlans(token);
             setStudyPlans(response);
             setLoading(false);
+            
+            // Fetch AI-generated plans for each study plan
+            response.forEach(plan => {
+                fetchAiGeneratedPlan(plan.userId || user?._id);
+            });
         } catch (err) {
             console.error('Error fetching study plans:', err);
             setError('Failed to fetch study plans');
             setLoading(false);
         }
-    }, [token]);
+    }, [token, user]);
+
+    // Fetch AI-generated study plan from ai_gens collection
+    const fetchAiGeneratedPlan = async (userId) => {
+        try {
+            const response = await axios.get(`http://localhost:4000/api/ai_gens/study_plan/${userId}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.data && response.data.content) {
+                setAiGeneratedPlans(prev => ({
+                    ...prev,
+                    [userId]: response.data.content
+                }));
+            }
+        } catch (error) {
+            console.error('Error fetching AI-generated study plan:', error);
+            // Don't set the global error state, just log the error
+        }
+    };
 
     useEffect(() => {
         if (token) {
             fetchStudyPlans();
         }
     }, [fetchStudyPlans, token]);
+
+    useEffect(() => {
+        // Fetch AI plan for the current user if they exist
+        if (user && user._id) {
+            fetchAiGeneratedPlan(user._id);
+        }
+    }, [user, token]);
 
     const fetchUserSchedule = useCallback(async () => {
         try {
@@ -216,6 +251,36 @@ const StudyPlanPage = () => {
         });
     };
 
+    // Get the AI-generated study plan content for a specific user
+    const getAiPlanContent = (userId) => {
+        return aiGeneratedPlans[userId || user?._id] || "Loading AI-generated study plan...";
+    };
+
+    // Regenerate AI plan trigger
+    const handleRegenerateAiPlan = async (userId) => {
+        try {
+            const response = await axios.post(
+                `http://localhost:4000/api/ai_gens/generate_study_plan`,
+                { userId: userId || user?._id },
+                {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            if (response.data && response.data.success) {
+                alert("Study plan regeneration started. This may take a minute.");
+                // Poll for the new study plan after a short delay
+                setTimeout(() => fetchAiGeneratedPlan(userId || user?._id), 5000);
+            }
+        } catch (error) {
+            console.error('Error regenerating AI study plan:', error);
+            alert('Failed to regenerate AI study plan');
+        }
+    };
+
     return (
         <main className='main'>
             <div className="dashboard">
@@ -268,11 +333,22 @@ const StudyPlanPage = () => {
                                                     className="schedule-preview-image"
                                                 />
                                             </div>
-                                            <textarea 
-                                                readOnly
-                                                className="static-text-display"
-                                                value=""
-                                            />
+                                            <div className="ai-plan-section">
+                                                <div className="ai-plan-header">
+                                                    <h4>AI-Generated Study Schedule</h4>
+                                                    <button 
+                                                        className="regenerate-ai-plan-btn"
+                                                        onClick={() => handleRegenerateAiPlan(plan.userId)}
+                                                    >
+                                                        Regenerate
+                                                    </button>
+                                                </div>
+                                                <textarea 
+                                                    readOnly
+                                                    className="static-text-display"
+                                                    value={getAiPlanContent(plan.userId)}
+                                                />
+                                            </div>
                                             <div className="tasks-list">
                                                 <div className="tasks-header">
                                                     <h4>Tasks:</h4>
@@ -425,4 +501,4 @@ const StudyPlanPage = () => {
     );
 };
 
-export default StudyPlanPage; 
+export default StudyPlanPage;

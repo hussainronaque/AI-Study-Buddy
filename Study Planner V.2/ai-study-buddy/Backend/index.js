@@ -9,6 +9,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const scheduleRoutes = require('./routes/schedules');
 const studyPlanRoutes = require('./routes/studyPlans');
+const aiGensRoutes = require('./routes/aiGens');
 
 const app = express();
 
@@ -49,9 +50,11 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/study-plans', studyPlanRoutes);
+app.use('/api/ai_gens', aiGensRoutes);
 console.log('🛣️ Auth routes registered at /api/auth');
 console.log('🛣️ Schedule routes registered at /api/schedules');
 console.log('🛣️ Study Plan routes registered at /api/study-plans');
+console.log('🛣️ AI Gen routes registered at /api/ai_gens');
 
 // Error handling middleware
 app.use((err, req, res, next) => {

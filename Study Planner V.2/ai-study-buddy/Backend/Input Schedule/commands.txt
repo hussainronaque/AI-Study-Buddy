@@ -1,4 +1,9 @@
-Run command:
+New Run commands:
+python extract_and_upload.py --from-db --user 68050042748391a8dfb9fab1
+OR
+python study_plan.py --user 68050042748391a8dfb9fab1
+
+Old Run command:
 python "D:\.Files\Work\Habib\Semester 6\Software Engineering\Project\Repository\AI-Study-Buddy\Study Planner V.2\ai-study-buddy\Backend\Input Schedule\upload_schedule.py" --image "D:\.Files\Work\Habib\Semester 6\Software Engineering\Project\Repository\AI-Study-Buddy\Study Planner V.2\ai-study-buddy\Backend\Input Schedule\image.png" --user "68050042748391a8dfb9fab1"
 
 Image Path:

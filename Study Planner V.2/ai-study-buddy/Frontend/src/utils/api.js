@@ -3,6 +3,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:4000/api/auth';
 const SCHEDULE_URL = 'http://localhost:4000/api/schedules';
 const STUDY_PLANS_URL = 'http://localhost:4000/api/study-plans';
+const AI_GENS_URL = 'http://localhost:4000/api/ai_gens';
 
 // This file will be implemented later with actual API endpoints
 // For now, it contains placeholder functions
@@ -182,6 +183,38 @@ export const studyPlansApi = {
     try {
       const response = await axios.delete(`${STUDY_PLANS_URL}/${planId}`, {
         headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+};
+
+// AI-Generated Study Plan functions
+export const aiStudyPlanApi = {
+  // Load existing generated plan by userId
+  getGeneratedStudyPlan: async (token, userId) => {
+    try {
+      const response = await axios.get(`${AI_GENS_URL}/study_plan/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Trigger generation of a new plan
+  generateStudyPlan: async (token, payload) => {
+    try {
+      const response = await axios.post(`${AI_GENS_URL}/generate_study_plan`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       return response.data;
     } catch (error) {

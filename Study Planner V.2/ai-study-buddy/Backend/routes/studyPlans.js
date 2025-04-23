@@ -2,6 +2,52 @@ const express = require('express');
 const router = express.Router();
 const StudyPlan = require('../models/StudyPlan');
 const auth = require('../middleware/auth');
+const { spawn } = require('child_process');
+const path = require('path');
+
+// Helper function to run study plan script and return a promise
+const runStudyPlanScript = (userId) => {
+  return new Promise((resolve, reject) => {
+    const scriptPath = path.join(__dirname, '..', 'Input Schedule', 'study_plan.py');
+    
+    console.log(`Running Python script at: ${scriptPath}`);
+    
+    const pythonProcess = spawn('python', [
+      scriptPath,
+      '--user',
+      userId
+    ]);
+    
+    let scriptOutput = '';
+    let scriptError = '';
+    
+    pythonProcess.stdout.on('data', (data) => {
+      scriptOutput += data.toString();
+      console.log(`Python script output: ${data}`);
+    });
+    
+    pythonProcess.stderr.on('data', (data) => {
+      scriptError += data.toString();
+      console.error(`Python script error: ${data}`);
+    });
+    
+    pythonProcess.on('close', (code) => {
+      if (code === 0) {
+        resolve(scriptOutput);
+      } else {
+        console.error(`Python script exited with code ${code}`);
+        // Still resolve to not block the API response
+        resolve(scriptOutput);
+      }
+    });
+    
+    pythonProcess.on('error', (err) => {
+      console.error('Failed to start Python script:', err);
+      // Still resolve to not block the API response
+      resolve(null);
+    });
+  });
+};
 
 // Create a new study plan
 router.post('/', auth, async (req, res) => {
@@ -28,7 +74,14 @@ router.post('/', auth, async (req, res) => {
         });
 
         await studyPlan.save();
-        res.status(201).json(studyPlan);
+        
+        // Run Python script after creating the study plan and wait for it to complete
+        await runStudyPlanScript(req.user.id);
+        
+        // Fetch the updated study plan after the script has run
+        const updatedStudyPlan = await StudyPlan.findById(studyPlan._id);
+        
+        res.status(201).json(updatedStudyPlan);
     } catch (err) {
         console.error('Error creating study plan:', err);
         res.status(500).json({ message: 'Error creating study plan', error: err.message });
@@ -74,7 +127,14 @@ router.put('/:id', auth, async (req, res) => {
         }));
 
         await studyPlan.save();
-        res.json(studyPlan);
+        
+        // Run Python script after updating the study plan and wait for it to complete
+        await runStudyPlanScript(req.user.id);
+        
+        // Fetch the updated study plan after the script has run
+        const updatedStudyPlan = await StudyPlan.findById(req.params.id);
+        
+        res.json(updatedStudyPlan);
     } catch (err) {
         console.error('Error updating study plan:', err);
         res.status(500).json({ message: 'Error updating study plan', error: err.message });
@@ -102,4 +162,4 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -21,6 +21,7 @@ const Sidebar = () => {
         <button className="nav-item" onClick={() => navigate('/dashboard')}>Dashboard</button>
         <button className="nav-item" onClick={() => navigate('/study-plans')}>Study Plans</button>
         <button className="nav-item" onClick={() => navigate('/notes')}>Notes</button>
+        <button className="nav-item" onClick={() => navigate('/settings')}>⚙️ Settings</button>
       </div>
       <button className="sidebar-logout-btn" onClick={handleLogout}>Logout</button>
     </div>

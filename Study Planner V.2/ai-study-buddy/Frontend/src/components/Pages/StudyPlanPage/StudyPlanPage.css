@@ -7,7 +7,7 @@
 
 .dashboard {
     flex: 1;
-    background-color: #f4f6fa;
+    background-color: var(--background-color, #f4f6fa);
     padding: 30px;
     overflow-y: auto;
     overflow-x: hidden;

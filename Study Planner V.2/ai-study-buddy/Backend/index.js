@@ -10,6 +10,8 @@ const authRoutes = require('./routes/auth');
 const scheduleRoutes = require('./routes/schedules');
 const studyPlanRoutes = require('./routes/studyPlans');
 const aiGensRoutes = require('./routes/aiGens');
+const notesRoutes = require('./routes/notes');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -18,21 +20,28 @@ const uploadsDir = path.join(__dirname, 'uploads/schedules');
 fs.mkdirSync(uploadsDir, { recursive: true });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Frontend URL
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 // Debug logging middleware
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  console.log('Headers:', req.headers);
-  console.log('Body:', req.method === 'POST' ? req.body : 'N/A');
-  next();
+    console.log('=== Incoming Request ===');
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.method === 'POST' ? req.body : 'N/A');
+    console.log('=== End Request ===');
+    next();
 });
 
 // Test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend is working!' });
+    res.json({ message: 'Backend is working!' });
 });
 
 // Connect to MongoDB site_database
@@ -51,10 +60,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/study-plans', studyPlanRoutes);
 app.use('/api/ai_gens', aiGensRoutes);
+app.use('/api/notes', notesRoutes);
+app.use('/api/settings', settingsRoutes);
 console.log('🛣️ Auth routes registered at /api/auth');
 console.log('🛣️ Schedule routes registered at /api/schedules');
 console.log('🛣️ Study Plan routes registered at /api/study-plans');
 console.log('🛣️ AI Gen routes registered at /api/ai_gens');
+console.log('🛣️ Notes routes registered at /api/notes');
+console.log('🛣️ Settings routes registered at /api/settings');
 
 // Error handling middleware
 app.use((err, req, res, next) => {

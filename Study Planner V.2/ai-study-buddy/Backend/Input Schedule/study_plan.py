@@ -1,5 +1,5 @@
 import pymongo
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
@@ -70,11 +70,17 @@ def parse_schedule(raw_schedule):
         raw_end   = item.get("end_time", "")
 
         if isinstance(raw_start, datetime):
+            # Convert to server's local time
+            if raw_start.tzinfo is not None:
+                raw_start = raw_start.astimezone(None)  # Convert to server's local timezone
             start_str = raw_start.strftime("%Y-%m-%d %H:%M:%S")
         else:
             start_str = raw_start
 
         if isinstance(raw_end, datetime):
+            # Convert to server's local time
+            if raw_end.tzinfo is not None:
+                raw_end = raw_end.astimezone(None)  # Convert to server's local timezone
             end_str = raw_end.strftime("%Y-%m-%d %H:%M:%S")
         else:
             end_str = raw_end
@@ -97,8 +103,10 @@ def expand_daily_schedule(parsed_schedule):
     }
     daily_schedule = {day: [] for day in days_mapping.values()}
     for course in parsed_schedule:
+        # Parse dates in server's local time
         start_time = datetime.strptime(course['start_time'], "%Y-%m-%d %H:%M:%S")
-        end_time   = datetime.strptime(course['end_time'], "%Y-%m-%d %H:%M:%S")
+        end_time = datetime.strptime(course['end_time'], "%Y-%m-%d %H:%M:%S")
+        
         for day_char in course['days']:
             if day_char in days_mapping:
                 daily_schedule[days_mapping[day_char]].append({
@@ -116,20 +124,25 @@ def find_gaps(daily_schedule, min_gap_minutes=30):
     gaps = {day: [] for day in daily_schedule}
     for day, classes in daily_schedule.items():
         if not classes:
-            morning = datetime.strptime("08:00", "%H:%M")
-            evening = datetime.strptime("22:00", "%H:%M")
+            # Use server's local time for morning and evening
+            morning = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0)
+            evening = datetime.now().replace(hour=22, minute=0, second=0, microsecond=0)
             gaps[day].append({'start': morning, 'end': evening, 'duration_mins': (evening-morning).seconds//60})
             continue
-        morning = datetime.strptime("08:00", "%H:%M")
+        
+        morning = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0)
         if (classes[0]['start_time'] - morning).seconds//60 >= min_gap_minutes:
             gaps[day].append({'start': morning, 'end': classes[0]['start_time'], 'duration_mins': (classes[0]['start_time']-morning).seconds//60})
+        
         for i in range(len(classes)-1):
             gap = (classes[i+1]['start_time'] - classes[i]['end_time']).seconds//60
             if gap >= min_gap_minutes:
                 gaps[day].append({'start': classes[i]['end_time'], 'end': classes[i+1]['start_time'], 'duration_mins': gap})
-        evening = datetime.strptime("22:00", "%H:%M")
+        
+        evening = datetime.now().replace(hour=22, minute=0, second=0, microsecond=0)
         if (evening - classes[-1]['end_time']).seconds//60 >= min_gap_minutes:
             gaps[day].append({'start': classes[-1]['end_time'], 'end': evening, 'duration_mins': (evening-classes[-1]['end_time']).seconds//60})
+    
     return gaps
 
 
@@ -155,8 +168,14 @@ def generate_study_plan(parsed_schedule, gaps, tasks):
     # Use the custom DateTimeEncoder for tasks
     tasks_str = json.dumps(tasks, indent=2, cls=DateTimeEncoder)
 
+    # Get server's current time
+    current_time = datetime.now()
+    current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S")
+
     prompt = f"""
-    I need help creating a study plan based on my schedule and upcoming tasks.
+    I need help creating a study plan based on my schedule and upcoming tasks, as well as the current date and time.
+
+    Take into account the current date and time: {current_time_str}, and so make the study plan till the date of submission. Be careful about the dates.
 
     Here's my current course schedule:
     {sched_str}

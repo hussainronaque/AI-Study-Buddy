@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './StudyPlanPage.css';
 import { useAuth } from '../../../context/AuthContext';
-import { studyPlansApi } from '../../../utils/api';
+import { studyPlansApi, aiStudyPlanApi } from '../../../utils/api';
 import ScheduleUpload from '../../../components/ScheduleUpload/ScheduleUpload';
 
 const StudyPlanPage = () => {
@@ -21,6 +21,8 @@ const StudyPlanPage = () => {
     const [editingPlanId, setEditingPlanId] = useState(null);
     const [editingTasks, setEditingTasks] = useState([]);
     const [aiGeneratedPlans, setAiGeneratedPlans] = useState({});
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState('');
 
     // Fetch study plans
     const fetchStudyPlans = useCallback(async () => {
@@ -259,30 +261,33 @@ const StudyPlanPage = () => {
     // Regenerate AI plan trigger
     const handleRegenerateAiPlan = async (userId) => {
         try {
-            const response = await axios.post(
-                `http://localhost:4000/api/ai_gens/generate_study_plan`,
-                { userId: userId || user?._id },
-                {
-                    headers: { 
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
+            setNotificationMessage("Regenerating study plan...");
+            setShowNotification(true);
             
-            if (response.data && response.data.success) {
-                alert("Study plan regeneration started. This may take a minute.");
+            const response = await aiStudyPlanApi.generateStudyPlan(token, { userId: userId || user?._id });
+            
+            if (response && response.success) {
+                setNotificationMessage("Study plan regeneration started. This may take a minute.");
                 // Poll for the new study plan after a short delay
-                setTimeout(() => fetchAiGeneratedPlan(userId || user?._id), 5000);
+                setTimeout(() => {
+                    fetchAiGeneratedPlan(userId || user?._id);
+                    setShowNotification(false);
+                }, 5000);
             }
         } catch (error) {
             console.error('Error regenerating AI study plan:', error);
-            alert('Failed to regenerate AI study plan');
+            setNotificationMessage('Failed to regenerate AI study plan');
+            setTimeout(() => setShowNotification(false), 3000);
         }
     };
 
     return (
         <main className='main'>
+            {/* Add the notification overlay */}
+            {showNotification && (
+                <div className="notification-overlay show" />
+            )}
+            
             <div className="dashboard">
                 <div className="welcome-section">
                     <h1>Study Plans</h1>
@@ -336,12 +341,19 @@ const StudyPlanPage = () => {
                                             <div className="ai-plan-section">
                                                 <div className="ai-plan-header">
                                                     <h4>AI-Generated Study Schedule</h4>
-                                                    <button 
-                                                        className="regenerate-ai-plan-btn"
-                                                        onClick={() => handleRegenerateAiPlan(plan.userId)}
-                                                    >
-                                                        Regenerate
-                                                    </button>
+                                                    <div style={{ position: 'relative' }}>
+                                                        {showNotification && (
+                                                            <div className="regenerate-notification show">
+                                                                {notificationMessage}
+                                                            </div>
+                                                        )}
+                                                        <button 
+                                                            className="regenerate-ai-plan-btn"
+                                                            onClick={() => handleRegenerateAiPlan(plan.userId)}
+                                                        >
+                                                            Regenerate
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <textarea 
                                                     readOnly

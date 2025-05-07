@@ -197,7 +197,7 @@ def generate_study_plan(parsed_schedule, gaps, tasks):
     """
 
     response = client.chat.completions.create(
-        model="gpt-4.1-mini-2025-04-14",
+        model="gpt-4.1-nano-2025-04-14",
         messages=[
             {"role": "system", "content": "You are a helpful academic assistant specializing in time management and study planning. Provide direct, clean responses without markdown formatting (no ### headings or ** bold text) and without starting with phrases like 'Certainly!' or 'Here's your study plan:'"},
             {"role": "user", "content": prompt}

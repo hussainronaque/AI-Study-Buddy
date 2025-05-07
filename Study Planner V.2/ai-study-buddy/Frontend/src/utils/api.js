@@ -30,30 +30,34 @@ export const login = async (credentials) => {
   }
 };
 
+// Add or update these functions in your api.js file
 export const forgotPassword = async (email) => {
   try {
-    const response = await axios.post(`${API_URL}/forgot-password`, { email });
+    const response = await axios.post('http://localhost:4000/api/auth/forgot-password', { email });
     return response.data;
   } catch (error) {
-    throw error.response?.data || error;
+    throw error;
   }
 };
 
-export const verifyOTP = async (email, otp) => {
+export const verifyOtp = async (email, otp) => {
   try {
-    const response = await axios.post(`${API_URL}/verify-otp`, { email, otp });
+    const response = await axios.post('http://localhost:4000/api/auth/verify-otp', { email, otp });
     return response.data;
   } catch (error) {
-    throw error.response?.data || error;
+    throw error;
   }
 };
 
 export const resetPassword = async (email, newPassword) => {
   try {
-    const response = await axios.post(`${API_URL}/reset-password`, { email, newPassword });
+    const response = await axios.post('http://localhost:4000/api/auth/reset-password', { 
+      email, 
+      newPassword 
+    });
     return response.data;
   } catch (error) {
-    throw error.response?.data || error;
+    throw error;
   }
 };
 

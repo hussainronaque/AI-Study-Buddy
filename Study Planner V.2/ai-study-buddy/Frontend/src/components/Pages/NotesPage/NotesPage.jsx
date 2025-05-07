@@ -158,7 +158,6 @@ const NotesPage = () => {
                                 <NoteCard
                                     key={note._id}
                                     note={note}
-                                    onPin={handleTogglePin}
                                     onDelete={handleDeleteNote}
                                 />
                             ))

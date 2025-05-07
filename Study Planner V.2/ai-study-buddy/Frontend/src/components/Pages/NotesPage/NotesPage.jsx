@@ -134,12 +134,6 @@ const NotesPage = () => {
                                 <option key={category} value={category}>{category}</option>
                             ))}
                         </select>
-                        <button
-                            className={`archive-toggle ${showArchived ? 'active' : ''}`}
-                            onClick={() => setShowArchived(!showArchived)}
-                        >
-                            {showArchived ? 'Show Active' : 'Show Archived'}
-                        </button>
                     </div>
                 </div>
 
@@ -165,7 +159,6 @@ const NotesPage = () => {
                                     key={note._id}
                                     note={note}
                                     onPin={handleTogglePin}
-                                    onArchive={handleToggleArchive}
                                     onDelete={handleDeleteNote}
                                 />
                             ))

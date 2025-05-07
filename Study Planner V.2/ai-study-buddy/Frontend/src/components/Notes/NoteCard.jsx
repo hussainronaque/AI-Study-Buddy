@@ -11,20 +11,6 @@ const NoteCard = ({ note, onPin, onArchive, onDelete }) => {
                 <h3>{note.title}</h3>
                 <div className="note-actions">
                     <button 
-                        className="action-btn pin-btn" 
-                        onClick={() => onPin(note._id)}
-                        title={note.isPinned ? "Unpin" : "Pin"}
-                    >
-                        {note.isPinned ? '📌' : '📍'}
-                    </button>
-                    <button 
-                        className="action-btn archive-btn" 
-                        onClick={() => onArchive(note._id)}
-                        title={note.isArchived ? "Unarchive" : "Archive"}
-                    >
-                        {note.isArchived ? '📦' : '🗃️'}
-                    </button>
-                    <button 
                         className="action-btn delete-btn" 
                         onClick={() => onDelete(note._id)}
                         title="Delete"

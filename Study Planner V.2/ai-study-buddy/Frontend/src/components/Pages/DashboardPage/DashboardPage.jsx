@@ -128,44 +128,6 @@ const DashboardPage = () => {
                         </div>
                     </div>
                 )}
-
-                <div className="dashboard-grid">
-                    {/* Recent Notes Card */}
-                    <div className="dashboard-card">
-                        <h3>Recent Notes</h3>
-                        {loading ? (
-                            <p>Loading notes...</p>
-                        ) : recentNotes.length === 0 ? (
-                            <p>No notes yet</p>
-                        ) : (
-                            <div className="recent-notes-list">
-                                {recentNotes.map(note => (
-                                    <div key={note._id} className="recent-note-item" onClick={() => navigate('/notes')}>
-                                        <h4>{note.title}</h4>
-                                        <p>{note.content.substring(0, 50)}...</p>
-                                        <small>{new Date(note.updatedAt).toLocaleDateString()}</small>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Other Dashboard Cards */}
-                    <div className="dashboard-card">
-                        <h3>Upcoming Tasks</h3>
-                        <p>No tasks scheduled</p>
-                    </div>
-
-                    <div className="dashboard-card">
-                        <h3>Calendar Events</h3>
-                        <p>No upcoming events</p>
-                    </div>
-
-                    <div className="dashboard-card">
-                        <h3>AI Study Tips</h3>
-                        <p>Ask AI for study recommendations</p>
-                    </div>
-                </div>
             </div>
         </main>
     );

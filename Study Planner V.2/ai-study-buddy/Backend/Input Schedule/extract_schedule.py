@@ -18,7 +18,7 @@ class ColumnBasedScheduleProcessor:
         Initialize the Schedule Processor with OpenAI client
         """
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.model = "gpt-4.1-mini-2025-04-14"
+        self.model = "gpt-4.1-nano-2025-04-14"
 
     def ensure_valid_image_format(self, image_data):
         """

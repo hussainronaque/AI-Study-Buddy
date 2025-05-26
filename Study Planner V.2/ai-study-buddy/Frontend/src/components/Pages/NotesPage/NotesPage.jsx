@@ -5,6 +5,7 @@ import './NotesPage.css';
 import NoteCard from '../../Notes/NoteCard.jsx';
 import NoteForm from '../../Notes/NoteForm.jsx';
 import { useAuth } from '../../../context/AuthContext';
+import config from '../../../config';
 
 
 const NotesPage = () => {
@@ -33,7 +34,7 @@ const NotesPage = () => {
     const fetchNotes = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:4000/api/notes', {
+            const response = await axios.get(`${config.API_URL}/api/notes`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotes(response.data);
@@ -48,7 +49,7 @@ const NotesPage = () => {
         if (newNote.title.trim() && newNote.content.trim()) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.post('http://localhost:4000/api/notes', newNote, {
+                const response = await axios.post(`${config.API_URL}/api/notes`, newNote, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setNotes([response.data, ...notes]);
@@ -67,7 +68,7 @@ const NotesPage = () => {
 
     const handleDeleteNote = async (id) => {
         try {
-            await axios.delete(`http://localhost:4000/api/notes/${id}`, {
+            await axios.delete(`${config.API_URL}/api/notes/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotes(notes.filter(note => note._id !== id));
@@ -79,7 +80,7 @@ const NotesPage = () => {
     const handleTogglePin = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.patch(`http://localhost:4000/api/notes/${id}/toggle-pin`, {}, {
+            const response = await axios.patch(`${config.API_URL}/api/notes/${id}/toggle-pin`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotes(notes.map(note => 
@@ -93,7 +94,7 @@ const NotesPage = () => {
     const handleToggleArchive = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.patch(`http://localhost:4000/api/notes/${id}/toggle-archive`, {}, {
+            const response = await axios.patch(`${config.API_URL}/api/notes/${id}/toggle-archive`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotes(notes.map(note => 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SettingsPage.css';
 import { useAuth } from '../../../context/AuthContext';
+import config from '../../../config';
 
 const SettingsPage = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const SettingsPage = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const response = await axios.get(`http://localhost:4000/api/settings/${user.id}`, {
+                const response = await axios.get(`${config.API_URL}/api/settings/${user.id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (response.data) {
@@ -69,7 +70,7 @@ const SettingsPage = () => {
             });
 
             const response = await axios.put(
-                `http://localhost:4000/api/settings/${user.id}`,
+                `${config.API_URL}/api/settings/${user.id}`,
                 {
                     backgroundColor: theme.backgroundColor,
                     sidebarColor: theme.sidebarColor

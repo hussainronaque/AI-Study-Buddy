@@ -5,6 +5,7 @@ import './StudyPlanPage.css';
 import { useAuth } from '../../../context/AuthContext';
 import { studyPlansApi, aiStudyPlanApi } from '../../../utils/api';
 import ScheduleUpload from '../../../components/ScheduleUpload/ScheduleUpload';
+import config from '../../../config';
 
 const StudyPlanPage = () => {
     const navigate = useNavigate();
@@ -45,11 +46,12 @@ const StudyPlanPage = () => {
     // Fetch AI-generated study plan from ai_gens collection
     const fetchAiGeneratedPlan = async (userId) => {
         try {
-            const response = await axios.get(`http://localhost:4000/api/ai_gens/study_plan/${userId}`, {
+            const response = await axios.get(`${config.API_URL}/api/ai_gens/study_plan/${userId}`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                timeout: 30000 // 30 second timeout
             });
             
             if (response.data && response.data.content) {
@@ -57,10 +59,19 @@ const StudyPlanPage = () => {
                     ...prev,
                     [userId]: response.data.content
                 }));
+            } else {
+                console.log('No AI-generated plan content found');
+                setAiGeneratedPlans(prev => ({
+                    ...prev,
+                    [userId]: 'No AI-generated plan available yet. Please try again in a few moments.'
+                }));
             }
         } catch (error) {
             console.error('Error fetching AI-generated study plan:', error);
-            // Don't set the global error state, just log the error
+            setAiGeneratedPlans(prev => ({
+                ...prev,
+                [userId]: 'Failed to generate AI study plan. Please try again.'
+            }));
         }
     };
 
@@ -79,7 +90,7 @@ const StudyPlanPage = () => {
 
     const fetchUserSchedule = useCallback(async () => {
         try {
-            const response = await axios.get('http://localhost:4000/api/schedules', {
+            const response = await axios.get(`${config.API_URL}/api/schedules`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

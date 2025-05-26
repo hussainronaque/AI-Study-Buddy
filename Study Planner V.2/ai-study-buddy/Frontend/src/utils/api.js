@@ -1,9 +1,10 @@
 import axios from 'axios';
+import config from '../config';
 
-const API_URL = 'http://localhost:4000/api/auth';
-const SCHEDULE_URL = 'http://localhost:4000/api/schedules';
-const STUDY_PLANS_URL = 'http://localhost:4000/api/study-plans';
-const AI_GENS_URL = 'http://localhost:4000/api/ai_gens';
+const API_URL = `${config.API_URL}/api/auth`;
+const SCHEDULE_URL = `${config.API_URL}/api/schedules`;
+const STUDY_PLANS_URL = `${config.API_URL}/api/study-plans`;
+const AI_GENS_URL = `${config.API_URL}/api/ai_gens`;
 
 // This file will be implemented later with actual API endpoints
 // For now, it contains placeholder functions
@@ -33,7 +34,7 @@ export const login = async (credentials) => {
 // Add or update these functions in your api.js file
 export const forgotPassword = async (email) => {
   try {
-    const response = await axios.post('http://localhost:4000/api/auth/forgot-password', { email });
+    const response = await axios.post(`${API_URL}/forgot-password`, { email });
     return response.data;
   } catch (error) {
     throw error;
@@ -42,7 +43,7 @@ export const forgotPassword = async (email) => {
 
 export const verifyOtp = async (email, otp) => {
   try {
-    const response = await axios.post('http://localhost:4000/api/auth/verify-otp', { email, otp });
+    const response = await axios.post(`${API_URL}/verify-otp`, { email, otp });
     return response.data;
   } catch (error) {
     throw error;
@@ -51,7 +52,7 @@ export const verifyOtp = async (email, otp) => {
 
 export const resetPassword = async (email, newPassword) => {
   try {
-    const response = await axios.post('http://localhost:4000/api/auth/reset-password', { 
+    const response = await axios.post(`${API_URL}/reset-password`, { 
       email, 
       newPassword 
     });

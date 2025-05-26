@@ -21,13 +21,29 @@ fs.mkdirSync(uploadsDir, { recursive: true });
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000', // Frontend URL
+    origin: '*',  // Allow all origins
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+// Root route
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'AI Study Buddy API is running!',
+        version: '1.0.0',
+        endpoints: {
+            auth: '/api/auth',
+            schedules: '/api/schedules',
+            studyPlans: '/api/study-plans',
+            aiGens: '/api/ai_gens',
+            notes: '/api/notes',
+            settings: '/api/settings'
+        }
+    });
+});
 
 // Debug logging middleware
 app.use((req, res, next) => {
@@ -79,8 +95,8 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📍 Test the server at http://localhost:${PORT}/api/test`);
 });

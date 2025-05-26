@@ -12,7 +12,7 @@ const runStudyPlanScript = (userId) => {
     
     console.log(`Running Python script at: ${scriptPath}`);
     
-    const pythonProcess = spawn('python', [
+    const pythonProcess = spawn('python3', [
       scriptPath,
       '--user',
       userId
@@ -20,6 +20,13 @@ const runStudyPlanScript = (userId) => {
     
     let scriptOutput = '';
     let scriptError = '';
+    
+    // Set a timeout of 30 seconds
+    const timeout = setTimeout(() => {
+      pythonProcess.kill();
+      console.error('Python script timed out after 30 seconds');
+      resolve(null); // Resolve with null to not block the API
+    }, 30000);
     
     pythonProcess.stdout.on('data', (data) => {
       scriptOutput += data.toString();
@@ -32,19 +39,20 @@ const runStudyPlanScript = (userId) => {
     });
     
     pythonProcess.on('close', (code) => {
+      clearTimeout(timeout);
       if (code === 0) {
         resolve(scriptOutput);
       } else {
         console.error(`Python script exited with code ${code}`);
-        // Still resolve to not block the API response
-        resolve(scriptOutput);
+        console.error(`Script error: ${scriptError}`);
+        resolve(null); // Resolve with null to not block the API
       }
     });
     
     pythonProcess.on('error', (err) => {
+      clearTimeout(timeout);
       console.error('Failed to start Python script:', err);
-      // Still resolve to not block the API response
-      resolve(null);
+      resolve(null); // Resolve with null to not block the API
     });
   });
 };

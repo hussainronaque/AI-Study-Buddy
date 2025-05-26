@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { verifyOtp, forgotPassword } from '../../../utils/api';
 import './OTPPage.css';
 
 import website_logo_transparent from '../../Assets/website-logo-transparent.png';
@@ -66,7 +66,7 @@ const OTPPage = () => {
         }
     };
 
-    const verifyOtp = async () => {
+    const verifyOtpHandler = async () => {
         const enteredOTP = otp.join('');
         
         if (enteredOTP.length !== 6) {
@@ -78,12 +78,9 @@ const OTPPage = () => {
         setError('');
 
         try {
-            const response = await axios.post('http://localhost:4000/api/auth/verify-otp', {
-                email,
-                otp: enteredOTP
-            });
+            const response = await verifyOtp(email, enteredOTP);
 
-            if (response.data.message === 'OTP verified successfully') {
+            if (response.message === 'OTP verified successfully') {
                 navigate('/new-password', { state: { email } });
             }
         } catch (err) {
@@ -105,11 +102,9 @@ const OTPPage = () => {
         setError('');
 
         try {
-            const response = await axios.post('http://localhost:4000/api/auth/forgot-password', {
-                email
-            });
+            const response = await forgotPassword(email);
 
-            if (response.data.message === 'OTP sent to your email') {
+            if (response.message === 'OTP sent to your email') {
                 setTimer(600);
                 setCanResend(false);
                 setOtp(['', '', '', '', '', '']);
@@ -174,7 +169,7 @@ const OTPPage = () => {
 
                 <div 
                     className={`submit-container ${loading ? 'loading' : ''}`}
-                    onClick={verifyOtp}
+                    onClick={verifyOtpHandler}
                 >
                     {loading ? 'Verifying...' : 'Verify OTP'}
                 </div>

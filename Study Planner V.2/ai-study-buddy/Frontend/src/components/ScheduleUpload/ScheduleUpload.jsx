@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { scheduleApi } from '../../utils/api';
+import config from '../../config';
 import './ScheduleUpload.css';
 
 const ScheduleUpload = ({ onUploadSuccess }) => {
@@ -29,8 +30,7 @@ const ScheduleUpload = ({ onUploadSuccess }) => {
                 }
 
                 // Construct the full URL for the image
-                const baseUrl = 'http://localhost:4000/';
-                const imageUrl = `${baseUrl}${schedule.scheduleImage}`;
+                const imageUrl = `${config.API_URL}/${schedule.scheduleImage}`;
                 console.log('Constructed image URL:', imageUrl);
 
                 onUploadSuccess({

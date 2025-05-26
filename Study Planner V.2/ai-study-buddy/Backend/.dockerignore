@@ -1,0 +1,3 @@
+# flyctl launch added from Input Schedule/.gitignore
+Input Schedule/**/.env
+fly.toml

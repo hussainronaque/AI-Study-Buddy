@@ -12,6 +12,7 @@ const studyPlanRoutes = require('./routes/studyPlans');
 const aiGensRoutes = require('./routes/aiGens');
 const notesRoutes = require('./routes/notes');
 const settingsRoutes = require('./routes/settings');
+const todosRoutes = require('./routes/todos');
 
 const app = express();
 
@@ -25,11 +26,14 @@ const corsOptions = {
         'http://localhost:3000', 
         'http://localhost:3001', 
         'https://backend-self-theta-51.vercel.app',
-        'https://ai-study-buddy-three.vercel.app'
+        'https://ai-study-buddy-three.vercel.app',
+        'https://*.vercel.app'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400 // 24 hours
 };
 
 // Middleware
@@ -48,7 +52,8 @@ app.get('/', (req, res) => {
             studyPlans: '/api/study-plans',
             aiGens: '/api/ai_gens',
             notes: '/api/notes',
-            settings: '/api/settings'
+            settings: '/api/settings',
+            todos: '/api/todos'
         }
     });
 });
@@ -105,12 +110,14 @@ app.use('/api/study-plans', studyPlanRoutes);
 app.use('/api/ai_gens', aiGensRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/todos', todosRoutes);
 console.log('🛣️ Auth routes registered at /api/auth');
 console.log('🛣️ Schedule routes registered at /api/schedules');
 console.log('🛣️ Study Plan routes registered at /api/study-plans');
 console.log('🛣️ AI Gen routes registered at /api/ai_gens');
 console.log('🛣️ Notes routes registered at /api/notes');
 console.log('🛣️ Settings routes registered at /api/settings');
+console.log('🛣️ Todos routes registered at /api/todos');
 
 // Error handling middleware
 app.use((err, req, res, next) => {

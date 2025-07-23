@@ -5,6 +5,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "react-scripts": "^5.0.1",
     "express": "^4.18.2"
   }
 }

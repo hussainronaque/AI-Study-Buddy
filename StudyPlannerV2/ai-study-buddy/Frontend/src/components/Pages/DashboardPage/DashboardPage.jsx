@@ -79,7 +79,7 @@ const DashboardPage = () => {
                 const response = await todosApi.createTodo(token, { text: newTodo });
                 console.log('Todo created:', response);
                 setTodos([response, ...todos]);
-                setNewTodo('');
+            setNewTodo('');
             } catch (error) {
                 console.error('Error creating todo:', error.response?.data || error);
                 alert('Failed to create todo. Please try again.');
@@ -169,14 +169,14 @@ const DashboardPage = () => {
                             ) : (
                                 todos.map(todo => (
                                     <div key={todo._id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            checked={todo.completed}
+                                    <input
+                                        type="checkbox"
+                                        checked={todo.completed}
                                             onChange={() => toggleTodo(todo._id)}
-                                        />
-                                        <span className="todo-text">{todo.text}</span>
+                                    />
+                                    <span className="todo-text">{todo.text}</span>
                                         <button onClick={() => deleteTodo(todo._id)} className="delete-todo-btn">×</button>
-                                    </div>
+                                </div>
                                 ))
                             )}
                         </div>

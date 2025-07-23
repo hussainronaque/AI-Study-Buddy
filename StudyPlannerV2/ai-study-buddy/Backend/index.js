@@ -25,8 +25,6 @@ const corsOptions = {
     origin: [
         'http://localhost:3000', 
         'http://localhost:3001', 
-        'https://backend-self-theta-51.vercel.app',
-        'https://ai-study-buddy-three.vercel.app',
         'https://*.vercel.app'
     ],
     credentials: true,
